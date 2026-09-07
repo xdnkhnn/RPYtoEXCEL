@@ -1,4 +1,4 @@
-# RenPy Translator Tool
+# RenPy Translation Tool
 
 GUI tool for extracting Ren'Py `.rpy` files to Excel and merging them back.
 
