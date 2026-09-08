@@ -12,7 +12,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 # Từ điển đa ngôn ngữ (Multilingual Dictionary)
 TRANSLATIONS = {
     "English": {
-        "title": "Ren'Py Translation Tool",
+        "title": "RPYtoEXCEL",
         "language_label": "Language / Ngôn ngữ:",
         "tab_export": " 1. Export RPY -> Excel ",
         "tab_merge": " 2. Merge Excel -> RPY ",
@@ -45,7 +45,7 @@ TRANSLATIONS = {
         "error": "Error"
     },
     "Tiếng Việt": {
-        "title": "Công Cụ Dịch Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "Language / Ngôn ngữ:",
         "tab_export": " 1. Trích Xuất RPY -> Excel ",
         "tab_merge": " 2. Ghép Excel -> RPY ",
@@ -78,7 +78,7 @@ TRANSLATIONS = {
         "error": "Lỗi"
     },
     "Español": {
-        "title": "Herramienta de Traducción Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "Idioma / Language:",
         "tab_export": " 1. Exportar RPY -> Excel ",
         "tab_merge": " 2. Combinar Excel -> RPY ",
@@ -111,7 +111,7 @@ TRANSLATIONS = {
         "error": "Error"
     },
     "中文": {
-        "title": "Ren'Py 翻译工具",
+        "title": "RPYtoEXCEL",
         "language_label": "语言 / Language:",
         "tab_export": " 1. 导出 RPY -> Excel ",
         "tab_merge": " 2. 合并 Excel -> RPY ",
@@ -144,7 +144,7 @@ TRANSLATIONS = {
         "error": "错误"
     },
     "Deutsch": {
-        "title": "Ren'Py Übersetzungswerkzeug",
+        "title": "RPYtoEXCEL",
         "language_label": "Sprache / Language:",
         "tab_export": " 1. Exportieren RPY -> Excel ",
         "tab_merge": " 2. Zusammenführen Excel -> RPY ",
@@ -177,7 +177,7 @@ TRANSLATIONS = {
         "error": "Fehler"
     },
     "Français": {
-        "title": "Outil de Traduction Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "Langue / Language:",
         "tab_export": " 1. Exporter RPY -> Excel ",
         "tab_merge": " 2. Fusionner Excel -> RPY ",
@@ -210,7 +210,7 @@ TRANSLATIONS = {
         "error": "Erreur"
     },
     "Bahasa Indonesia": {
-        "title": "Alat Penerjemah Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "Bahasa / Language:",
         "tab_export": " 1. Ekspor RPY -> Excel ",
         "tab_merge": " 2. Gabung Excel -> RPY ",
@@ -243,7 +243,7 @@ TRANSLATIONS = {
         "error": "Galat"
     },
     "العربية": {
-        "title": "أداة ترجمة Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "اللغة / Language:",
         "tab_export": " 1. تصدير RPY -> Excel ",
         "tab_merge": " 2. دمج Excel -> RPY ",
@@ -276,7 +276,7 @@ TRANSLATIONS = {
         "error": "خطأ"
     },
     "Türkçe": {
-        "title": "Ren'Py Çeviri Aracı",
+        "title": "RPYtoEXCEL",
         "language_label": "Dil / Language:",
         "tab_export": " 1. Dışa Aktar RPY -> Excel ",
         "tab_merge": " 2. Birleştir Excel -> RPY ",
@@ -309,7 +309,7 @@ TRANSLATIONS = {
         "error": "Hata"
     },
     "Português": {
-        "title": "Ferramenta de Tradução Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "Idioma / Language:",
         "tab_export": " 1. Exportar RPY -> Excel ",
         "tab_merge": " 2. Mesclar Excel -> RPY ",
@@ -342,7 +342,7 @@ TRANSLATIONS = {
         "error": "Erro"
     },
     "Polski": {
-        "title": "Narzędzie do Tłumaczenia Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "Język / Language:",
         "tab_export": " 1. Eksportuj RPY -> Excel ",
         "tab_merge": " 2. Scal Excel -> RPY ",
@@ -375,7 +375,7 @@ TRANSLATIONS = {
         "error": "Błąd"
     },
     "Русский": {
-        "title": "Инструмент Перевода Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "Язык / Language:",
         "tab_export": " 1. Экспорт RPY -> Excel ",
         "tab_merge": " 2. Слияние Excel -> RPY ",
@@ -408,7 +408,7 @@ TRANSLATIONS = {
         "error": "Ошибка"
     },
     "Українська": {
-        "title": "Інструмент Перекладу Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "Мова / Language:",
         "tab_export": " 1. Експорт RPY -> Excel ",
         "tab_merge": " 2. Злиття Excel -> RPY ",
@@ -441,7 +441,7 @@ TRANSLATIONS = {
         "error": "Помилка"
     },
     "日本語": {
-        "title": "Ren'Py 翻訳ツール",
+        "title": "RPYtoEXCEL",
         "language_label": "言語 / Language:",
         "tab_export": " 1. 抽出 RPY -> Excel ",
         "tab_merge": " 2. 統合 Excel -> RPY ",
@@ -474,7 +474,7 @@ TRANSLATIONS = {
         "error": "エラー"
     },
     "Italiano": {
-        "title": "Strumento di Traduzione Ren'Py",
+        "title": "RPYtoEXCEL",
         "language_label": "Lingua / Language:",
         "tab_export": " 1. Esporta RPY -> Excel ",
         "tab_merge": " 2. Unisci Excel -> RPY ",
@@ -513,7 +513,7 @@ class RenPyTranslatorApp:
         self.root = root
         self.current_lang = "English"
         
-        self.root.title("Ren'Py Translation Tool")
+        self.root.title("RPYtoEXCEL")
         self.root.geometry("680x560")
         self.root.resizable(True, True)
 
@@ -815,15 +815,7 @@ class RenPyTranslatorApp:
                     "H": 25
                 }
 
-                for sheetname in workbook.sheetnames:
-                    if sheetname == "Notes":
-                        continue
-                        
-                    ws = workbook[sheetname]
-                    for col_letter, width in col_widths.items():
-                        ws.column_dimensions[col_letter].width = width
-
-                    # Border
+                # Border kẻ ô xám nhạt
                 thin_border = Border(
                     left=Side(style='thin', color='D3D3D3'),
                     right=Side(style='thin', color='D3D3D3'),
@@ -886,8 +878,6 @@ class RenPyTranslatorApp:
 
         self.btn_merge = ttk.Button(self.merge_lf, text="", command=self.process_merge)
         self.btn_merge.pack(fill='x', padx=10, pady=25, ipady=5)
-
-        
 
     def browse_excel_file(self):
         f = filedialog.askopenfilename(
