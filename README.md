@@ -1,4 +1,4 @@
-# Ren'Py RPY to Excel Translator Tool
+# RPYtoEXCEL
 
 A lightweight GUI utility designed to extract Ren'Py `.rpy` script files into formatted Excel spreadsheets and seamlessly merge translations back into your game code without breaking syntax.
 
@@ -16,7 +16,7 @@ A lightweight GUI utility designed to extract Ren'Py `.rpy` script files into fo
 
 ## How to Use
 
-1. Download `app.exe` or `app.zip` from [Releases](https://github.com/xdnkhnn/RenPyTranslatorApp/releases).
+1. Download `RPYtoEXCEL.exe` or `RPYtoEXCEL.zip` from [Releases](https://github.com/xdnkhnn/RenPyTranslatorApp/releases).
 2. **Export (RPY -> Excel):**
    * Open the app and select your preferred language.
    * Select individual `.rpy` files or click **Add Folder...** to scan subdirectories automatically.
@@ -40,7 +40,7 @@ cd RenPyTranslatorApp
 pip install pandas openpyxl pyinstaller
 
 # Run application
-python app.py
+python RPYtoEXCEL.py
 
 # Build single executable (.exe)
-python -m PyInstaller --noconsole --onefile app.py
+python -m PyInstaller --noconsole --onefile RPYtoEXCEL.py
