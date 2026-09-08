@@ -1,12 +1,14 @@
 import os
 import sys
+import glob
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import pandas as pd
 import openpyxl
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment, Font
+from openpyxl.worksheet.table import Table, TableStyleInfo
 
-# Multilanguage
+# Từ điển đa ngôn ngữ (Multilingual Dictionary)
 TRANSLATIONS = {
     "English": {
         "title": "Ren'Py Translation Tool",
@@ -16,6 +18,7 @@ TRANSLATIONS = {
         "export_frame": " Extract Translation Files ",
         "export_desc": "Select or drop .rpy files to export into a single Excel file:",
         "btn_add_files": "Add RPY Files...",
+        "btn_add_folder": "Add Folder...",
         "btn_clear_list": "Clear List",
         "btn_start_export": " START EXPORT TO EXCEL ",
         "merge_frame": " Merge Translations into RPY Files ",
@@ -48,6 +51,7 @@ TRANSLATIONS = {
         "export_frame": " Trích xuất file dịch ",
         "export_desc": "Chọn các file .rpy để xuất ra 1 file Excel duy nhất:",
         "btn_add_files": "Thêm File RPY...",
+        "btn_add_folder": "Thêm Thư Mục...",
         "btn_clear_list": "Xóa Danh Sách",
         "btn_start_export": " BẮT ĐẦU XUẤT EXCEL ",
         "merge_frame": " Ghép bản dịch vào File RPY ",
@@ -80,6 +84,7 @@ TRANSLATIONS = {
         "export_frame": " Extraer archivos de traducción ",
         "export_desc": "Seleccione archivos .rpy para exportar a un único archivo Excel:",
         "btn_add_files": "Añadir archivos RPY...",
+        "btn_add_folder": "Añadir carpeta...",
         "btn_clear_list": "Limpiar lista",
         "btn_start_export": " INICIAR EXPORTACIÓN ",
         "merge_frame": " Combinar traducciones en archivos RPY ",
@@ -112,6 +117,7 @@ TRANSLATIONS = {
         "export_frame": " 提取翻译文件 ",
         "export_desc": "选择 .rpy 文件导出到单个 Excel 文件：",
         "btn_add_files": "添加 RPY 文件...",
+        "btn_add_folder": "添加文件夹...",
         "btn_clear_list": "清空列表",
         "btn_start_export": " 开始导出 Excel ",
         "merge_frame": " 将翻译合并到 RPY 文件 ",
@@ -144,6 +150,7 @@ TRANSLATIONS = {
         "export_frame": " Übersetzungsdateien extrahieren ",
         "export_desc": "Wählen Sie .rpy-Dateien zum Exportieren aus:",
         "btn_add_files": "RPY-Dateien hinzufügen...",
+        "btn_add_folder": "Ordner hinzufügen...",
         "btn_clear_list": "Liste leeren",
         "btn_start_export": " EXPORT STARTEN ",
         "merge_frame": " Übersetzungen in RPY-Dateien zusammenführen ",
@@ -176,6 +183,7 @@ TRANSLATIONS = {
         "export_frame": " Extraire les fichiers de traduction ",
         "export_desc": "Sélectionnez les fichiers .rpy à exporter :",
         "btn_add_files": "Ajouter fichiers RPY...",
+        "btn_add_folder": "Ajouter dossier...",
         "btn_clear_list": "Effacer la liste",
         "btn_start_export": " LANCER L'EXPORTATION ",
         "merge_frame": " Fusionner dans les fichiers RPY ",
@@ -208,6 +216,7 @@ TRANSLATIONS = {
         "export_frame": " Ekstrak Berkas Terjemahan ",
         "export_desc": "Pilih berkas .rpy untuk diekspor ke satu berkas Excel:",
         "btn_add_files": "Tambah Berkas RPY...",
+        "btn_add_folder": "Tambah Folder...",
         "btn_clear_list": "Bersihkan Daftar",
         "btn_start_export": " MULAI EKSPOR ",
         "merge_frame": " Gabung Terjemahan ke Berkas RPY ",
@@ -240,6 +249,7 @@ TRANSLATIONS = {
         "export_frame": " استخراج ملفات الترجمة ",
         "export_desc": "حدد ملفات .rpy للتصدير إلى ملف Excel واحد:",
         "btn_add_files": "إضافة ملفات RPY...",
+        "btn_add_folder": "إضافة مجلد...",
         "btn_clear_list": "مسح القائمة",
         "btn_start_export": " بدء التصدير ",
         "merge_frame": " دمج الترجمات في ملفات RPY ",
@@ -272,6 +282,7 @@ TRANSLATIONS = {
         "export_frame": " Çeviri Dosyalarını Ayıkla ",
         "export_desc": "Tek bir Excel dosyasına aktarmak için .rpy dosyalarını seçin:",
         "btn_add_files": "RPY Dosyası Ekle...",
+        "btn_add_folder": "Klasör Ekle...",
         "btn_clear_list": "Listeyi Temizle",
         "btn_start_export": " DIŞA AKTARMAYI BAŞLAT ",
         "merge_frame": " Çevirileri RPY Dosyalarına Birleştir ",
@@ -304,6 +315,7 @@ TRANSLATIONS = {
         "export_frame": " Extrair arquivos de tradução ",
         "export_desc": "Selecione arquivos .rpy para exportar para Excel:",
         "btn_add_files": "Adicionar arquivos RPY...",
+        "btn_add_folder": "Adicionar pasta...",
         "btn_clear_list": "Limpar lista",
         "btn_start_export": " INICIAR EXPORTAÇÃO ",
         "merge_frame": " Mesclar traduções nos arquivos RPY ",
@@ -336,6 +348,7 @@ TRANSLATIONS = {
         "export_frame": " Wyodrębnij pliki tłumaczeń ",
         "export_desc": "Wybierz pliki .rpy, aby wyeksportować do Excela:",
         "btn_add_files": "Dodaj pliki RPY...",
+        "btn_add_folder": "Dodaj folder...",
         "btn_clear_list": "Wyczyść listę",
         "btn_start_export": " ROZPOCZNIJ EKSPORT ",
         "merge_frame": " Scal tłumaczenia z plikami RPY ",
@@ -368,6 +381,7 @@ TRANSLATIONS = {
         "export_frame": " Извлечь файлы перевода ",
         "export_desc": "Выберите файлы .rpy для экспорта в один файл Excel:",
         "btn_add_files": "Добавить файлы RPY...",
+        "btn_add_folder": "Добавить папку...",
         "btn_clear_list": "Очистить список",
         "btn_start_export": " НАЧАТЬ ЭКСПОРТ В EXCEL ",
         "merge_frame": " Объединить переводы с файлами RPY ",
@@ -400,6 +414,7 @@ TRANSLATIONS = {
         "export_frame": " Витягти файли перекладу ",
         "export_desc": "Виберіть файли .rpy для експорту в один файл Excel:",
         "btn_add_files": "Додати файли RPY...",
+        "btn_add_folder": "Додати папку...",
         "btn_clear_list": "Очистити список",
         "btn_start_export": " ПОЧАТИ ЕКСПОРТ ",
         "merge_frame": " Об'єднати переклади з файлами RPY ",
@@ -432,6 +447,7 @@ TRANSLATIONS = {
         "export_frame": " 翻訳ファイルの抽出 ",
         "export_desc": ".rpy ファイルを選択して1つの Excel ファイルに出力します:",
         "btn_add_files": "RPY ファイルを追加...",
+        "btn_add_folder": "フォルダを追加...",
         "btn_clear_list": "リストをクリア",
         "btn_start_export": " EXCEL 抽出を開始 ",
         "merge_frame": " 翻訳を RPY ファイルに統合 ",
@@ -464,6 +480,7 @@ TRANSLATIONS = {
         "export_frame": " Estrai file di traduzione ",
         "export_desc": "Seleziona i file .rpy da esportare in un singolo file Excel:",
         "btn_add_files": "Aggiungi file RPY...",
+        "btn_add_folder": "Aggiungi cartella...",
         "btn_clear_list": "Svuota lista",
         "btn_start_export": " AVVIA ESPORTAZIONE ",
         "merge_frame": " Unisci traduzioni nei file RPY ",
@@ -486,14 +503,14 @@ TRANSLATIONS = {
         "dlg_select_folder": "Seleziona cartella",
         "warning": "Avviso",
         "success": "Successo",
-        "error": "Errore"
+        "error": "Erro"
     }
 }
 
 class RenPyTranslatorApp:
     def __init__(self, root):
         self.root = root
-        self.current_lang = "English"  # Ngôn ngữ mặc định
+        self.current_lang = "English"
         
         self.root.title("Ren'Py Translation Tool")
         self.root.geometry("680x560")
@@ -502,7 +519,6 @@ class RenPyTranslatorApp:
         style = ttk.Style()
         style.theme_use('clam')
 
-        # Language Selector Bar Header
         lang_frame = ttk.Frame(self.root)
         lang_frame.pack(fill='x', padx=15, pady=(10, 0))
 
@@ -519,21 +535,17 @@ class RenPyTranslatorApp:
         )
         self.lang_menu.pack(side='left')
 
-        # Notebook (Tabs)
         self.notebook = ttk.Notebook(root)
         self.notebook.pack(fill='both', expand=True, padx=10, pady=10)
 
-        # Tab 1: Export
         self.tab_export = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_export, text="")
         self.setup_export_tab()
 
-        # Tab 2: Merge
         self.tab_merge = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_merge, text="")
         self.setup_merge_tab()
 
-        # Cập nhật văn bản theo ngôn ngữ khởi tạo
         self.update_ui_text()
 
     def change_language(self, selected_lang):
@@ -547,18 +559,16 @@ class RenPyTranslatorApp:
         self.root.title(self.t("title"))
         self.lbl_lang_select.config(text=self.t("language_label"))
         
-        # Tabs
         self.notebook.tab(self.tab_export, text=self.t("tab_export"))
         self.notebook.tab(self.tab_merge, text=self.t("tab_merge"))
 
-        # Export Tab
         self.export_lf.config(text=self.t("export_frame"))
         self.lbl_export_desc.config(text=self.t("export_desc"))
         self.btn_add.config(text=self.t("btn_add_files"))
+        self.btn_add_folder.config(text=self.t("btn_add_folder"))
         self.btn_clear.config(text=self.t("btn_clear_list"))
         self.btn_export.config(text=self.t("btn_start_export"))
 
-        # Merge Tab
         self.merge_lf.config(text=self.t("merge_frame"))
         self.lbl_excel_step.config(text=self.t("lbl_excel_step"))
         self.btn_browse_excel.config(text=self.t("btn_browse_excel"))
@@ -566,9 +576,6 @@ class RenPyTranslatorApp:
         self.btn_browse_folder.config(text=self.t("btn_browse_folder"))
         self.btn_merge.config(text=self.t("btn_start_merge"))
 
-    # ----------------------------------------------------
-    # TAB 1: EXPORT (RPY -> EXCEL)
-    # ----------------------------------------------------
     def setup_export_tab(self):
         self.export_lf = ttk.LabelFrame(self.tab_export, text="")
         self.export_lf.pack(fill='both', expand=True, padx=15, pady=15)
@@ -592,6 +599,9 @@ class RenPyTranslatorApp:
         self.btn_add = ttk.Button(btn_box, text="", command=self.add_rpy_files)
         self.btn_add.pack(side='left', padx=5)
 
+        self.btn_add_folder = ttk.Button(btn_box, text="", command=self.add_rpy_folder)
+        self.btn_add_folder.pack(side='left', padx=5)
+
         self.btn_clear = ttk.Button(btn_box, text="", command=lambda: self.export_listbox.delete(0, tk.END))
         self.btn_clear.pack(side='left', padx=5)
 
@@ -610,6 +620,14 @@ class RenPyTranslatorApp:
             if f not in self.export_listbox.get(0, tk.END):
                 self.export_listbox.insert(tk.END, f)
 
+    def add_rpy_folder(self):
+        d = filedialog.askdirectory(title=self.t("dlg_select_folder"))
+        if d:
+            rpy_files = glob.glob(os.path.join(d, "**", "*.rpy"), recursive=True)
+            for f in rpy_files:
+                if f not in self.export_listbox.get(0, tk.END):
+                    self.export_listbox.insert(tk.END, f)
+
     def process_export(self):
         rpy_files = list(self.export_listbox.get(0, tk.END))
         if not rpy_files:
@@ -627,11 +645,12 @@ class RenPyTranslatorApp:
 
         try:
             with pd.ExcelWriter(save_path, engine='openpyxl') as writer:
-                # Sheet Notes
                 df_notes = pd.DataFrame([self.t("excel_notes_sheet")])
                 df_notes.to_excel(writer, sheet_name="Notes", index=False)
 
-                for file_path in rpy_files:
+                table_mapping = []
+
+                for table_idx, file_path in enumerate(rpy_files, start=1):
                     file_name = os.path.basename(file_path)
                     if not os.path.exists(file_path):
                         continue
@@ -654,14 +673,12 @@ class RenPyTranslatorApp:
                             if len(parts) >= 3:
                                 current_label = parts[2].replace(":", "").strip()
                         
-                        # dialogue lines
                         if line_strip.startswith("#") and '"' in line_strip:
                             start_pos = line.find('"')
                             end_pos = line.rfind('"')
                             
                             if start_pos != end_pos:
                                 english_text = line[start_pos + 1 : end_pos]
-                                
                                 if english_text.startswith("game/") or english_text.endswith(".rpy"):
                                     continue
                                 
@@ -674,7 +691,6 @@ class RenPyTranslatorApp:
                                         break
                                         
                                     next_line_strip = lines[next_idx].strip()
-                                    
                                     if next_line_strip.startswith("#") or next_line_strip.startswith("translate"):
                                         break
                                     
@@ -703,7 +719,6 @@ class RenPyTranslatorApp:
 
                                 extracted_data.append([file_name, idx, current_game_location, current_label, character_name, english_text, translated_text, ""])
 
-                        # old new
                         elif line_strip.startswith("old") and '"' in line_strip:
                             start_pos = line.find('"')
                             end_pos = line.rfind('"')
@@ -730,40 +745,88 @@ class RenPyTranslatorApp:
                     if extracted_data:
                         columns = ["File", "Line", "Original Location", "Label", "Tag Char", "Original", "Translated", "Notes"]
                         df = pd.DataFrame(extracted_data, columns=columns)
-                        sheet_name = file_name.replace(".rpy", "")
-                        sheet_name = sheet_name[:30]
+                        sheet_name = file_name.replace(".rpy", "")[:30]
                         df.to_excel(writer, sheet_name=sheet_name, index=False)
+                        
+                        table_name = f"Bảng_{table_idx}"
+                        table_mapping.append((sheet_name, table_name))
 
                 columns = ["File", "Line", "Original Location", "Label", "Tag Char", "Original", "Translated", "Notes"]
                 df_bo_sung = pd.DataFrame(columns=columns)
                 df_bo_sung.to_excel(writer, sheet_name="Addition", index=False)
 
                 workbook = writer.book
+
+                # Style Bảng KHÔNG MÀU (TableStyleLight1)
+                for sheet_name, table_name in table_mapping:
+                    ws = workbook[sheet_name]
+                    max_row = max(ws.max_row, 2)
+                    tab = Table(displayName=table_name, ref=f"A1:H{max_row}")
+                    style = TableStyleInfo(name="TableStyleLight1", showFirstColumn=False, showLastColumn=False, showRowStripes=False, showColumnStripes=False)
+                    tab.tableStyleInfo = style
+                    ws.add_table(tab)
+
+                # Sheet Notes & Bảng Progress
+                ws_notes = workbook["Notes"]
+                
+                ws_notes.cell(row=3, column=3, value="File").font = Font(bold=True)
+                ws_notes.cell(row=3, column=4, value="Progress").font = Font(bold=True)
+
+                start_row = 4
+                for idx, (sheet_name, table_name) in enumerate(table_mapping, start=start_row):
+                    ws_notes.cell(row=idx, column=3, value=sheet_name)
+                    
+                    cell_prog = ws_notes.cell(row=idx, column=4)
+                    cell_prog.value = f"=COUNTA({table_name}[Translated])/COUNTA({table_name}[Original])"
+                    cell_prog.number_format = '0.00%'
+
+                sum_row = start_row + len(table_mapping)
+                ws_notes.cell(row=sum_row, column=3, value="Sum").font = Font(bold=True)
+                
+                if table_mapping:
+                    trans_parts = [f"COUNTA({tname}[Translated])" for _, tname in table_mapping]
+                    orig_parts = [f"COUNTA({tname}[Original])" for _, tname in table_mapping]
+                    sum_formula = f"=({' + '.join(trans_parts)})/({' + '.join(orig_parts)})"
+                    
+                    cell_sum = ws_notes.cell(row=sum_row, column=4)
+                    cell_sum.value = sum_formula
+                    cell_sum.font = Font(bold=True)
+                    cell_sum.number_format = '0.00%'
+
+                # Định dạng độ rộng & Alignment đơn giản
                 col_widths = {
-                    "A": 12, "B": 10, "C": 22, "D": 22,
-                    "E": 10, "F": 45, "G": 45, "H": 25
+                    "A": 28,
+                    "B": 10,
+                    "C": 35,
+                    "D": 15,
+                    "E": 12,
+                    "F": 50,
+                    "G": 50,
+                    "H": 25
                 }
 
                 for sheetname in workbook.sheetnames:
-                    ws = workbook[sheetname]
-                    for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
-                        for cell in row:
-                            cell.alignment = Alignment(wrap_text=True, vertical="top")
-                    for col_letter, width in col_widths.items():
-                        ws.column_dimensions[col_letter].width = width
                     if sheetname == "Notes":
                         continue
-                    max_row = max(ws.max_row, 2)
-                    ws.auto_filter.ref = f"A1:H{max_row}"
+                        
+                    ws = workbook[sheetname]
+                    for col_letter, width in col_widths.items():
+                        ws.column_dimensions[col_letter].width = width
+
+                    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
+                        for cell in row:
+                            if cell.column_letter in ['F', 'G']:
+                                cell.alignment = Alignment(wrap_text=True, vertical="center", horizontal="left")
+                            elif cell.column_letter == 'B':
+                                cell.alignment = Alignment(vertical="center", horizontal="center")
+                            else:
+                                cell.alignment = Alignment(vertical="center", horizontal="left")
 
             messagebox.showinfo(self.t("success"), self.t("msg_success_export").format(save_path))
 
         except Exception as e:
             messagebox.showerror(self.t("error"), self.t("msg_err_export").format(str(e)))
 
-    # ----------------------------------------------------
-    # TAB 2: MERGE (EXCEL -> RPY)
-    # ----------------------------------------------------
     def setup_merge_tab(self):
         self.merge_lf = ttk.LabelFrame(self.tab_merge, text="")
         self.merge_lf.pack(fill='both', expand=True, padx=15, pady=15)
@@ -871,8 +934,13 @@ class RenPyTranslatorApp:
             for file_name in all_files:
                 file_path = os.path.join(rpy_dir, file_name)
                 
+                # Tìm đệ quy trong toàn bộ thư mục cháu/chắt
                 if not os.path.exists(file_path):
-                    continue
+                    matching = glob.glob(os.path.join(rpy_dir, "**", file_name), recursive=True)
+                    if matching:
+                        file_path = matching[0]
+                    else:
+                        continue
 
                 with open(file_path, "r", encoding="utf-8") as f:
                     lines = f.readlines()
@@ -897,7 +965,6 @@ class RenPyTranslatorApp:
                     idx = line_num - 1
                     line_content = new_lines[idx].strip()
 
-                    # Case 1: old new
                     if line_content.startswith("old "):
                         indent = new_lines[idx][:new_lines[idx].find("old")]
                         if orig:
@@ -911,7 +978,6 @@ class RenPyTranslatorApp:
                             if trans:
                                 new_lines.insert(idx + 1, f'{indent}new "{trans}"\n')
 
-                    # Case 2: #
                     elif line_content.startswith("#"):
                         if orig and '"' in new_lines[idx]:
                             first_q = new_lines[idx].find('"')
@@ -929,7 +995,6 @@ class RenPyTranslatorApp:
                                     suffix = next_l[last_q:] if last_q > first_q else '"\n'
                                     new_lines[idx + 1] = f'{prefix}{trans}{suffix}'
 
-                    # Case 3: Empty line
                     elif line_content == "" or not ('"' in line_content):
                         indent = "    "
                         if orig and trans:
@@ -941,7 +1006,6 @@ class RenPyTranslatorApp:
                         elif trans:
                             new_lines[idx] = f'{indent}"{trans}"\n'
 
-                    # Case 4: Normal dialogue line
                     elif '"' in line_content:
                         first_q = new_lines[idx].find('"')
                         last_q = new_lines[idx].rfind('"')
