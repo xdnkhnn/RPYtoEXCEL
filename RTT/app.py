@@ -5,8 +5,9 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import pandas as pd
 import openpyxl
-from openpyxl.styles import Alignment, Font
+from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 from openpyxl.worksheet.table import Table, TableStyleInfo
+
 
 # Từ điển đa ngôn ngữ (Multilingual Dictionary)
 TRANSLATIONS = {
@@ -757,7 +758,10 @@ class RenPyTranslatorApp:
 
                 workbook = writer.book
 
-                # Style Bảng KHÔNG MÀU (TableStyleLight1)
+                # Table
+                green_fill = PatternFill(start_color="356854", end_color="356854", fill_type="solid")
+                header_font = Font(bold=True, color="FFFFFF")
+
                 for sheet_name, table_name in table_mapping:
                     ws = workbook[sheet_name]
                     max_row = max(ws.max_row, 2)
@@ -766,11 +770,18 @@ class RenPyTranslatorApp:
                     tab.tableStyleInfo = style
                     ws.add_table(tab)
 
-                # Sheet Notes & Bảng Progress
+                    # Tô nền Xanh lá + Chữ Trắng cho Header
+                    for col in range(1, 9):
+                        cell = ws.cell(row=1, column=col)
+                        cell.fill = green_fill
+                        cell.font = header_font
+
+                # Sheet Notes & Progress
                 ws_notes = workbook["Notes"]
-                
-                ws_notes.cell(row=3, column=3, value="File").font = Font(bold=True)
-                ws_notes.cell(row=3, column=4, value="Progress").font = Font(bold=True)
+                ws_notes.cell(row=3, column=3, value="File").font = Font(bold=True, color="FFFFFF")
+                ws_notes.cell(row=3, column=4, value="Progress").font = Font(bold=True, color="FFFFFF")
+                ws_notes.cell(row=3, column=3).fill = green_fill
+                ws_notes.cell(row=3, column=4).fill = green_fill
 
                 start_row = 4
                 for idx, (sheet_name, table_name) in enumerate(table_mapping, start=start_row):
@@ -793,7 +804,6 @@ class RenPyTranslatorApp:
                     cell_sum.font = Font(bold=True)
                     cell_sum.number_format = '0.00%'
 
-                # Định dạng độ rộng & Alignment đơn giản
                 col_widths = {
                     "A": 28,
                     "B": 10,
@@ -813,8 +823,27 @@ class RenPyTranslatorApp:
                     for col_letter, width in col_widths.items():
                         ws.column_dimensions[col_letter].width = width
 
+                    # Border
+                thin_border = Border(
+                    left=Side(style='thin', color='D3D3D3'),
+                    right=Side(style='thin', color='D3D3D3'),
+                    top=Side(style='thin', color='D3D3D3'),
+                    bottom=Side(style='thin', color='D3D3D3')
+                )
+
+                for sheetname in workbook.sheetnames:
+                    if sheetname == "Notes":
+                        continue
+                        
+                    ws = workbook[sheetname]
+                    for col_letter, width in col_widths.items():
+                        ws.column_dimensions[col_letter].width = width
+
+                    # Áp dụng kẻ ô cho toàn bộ dòng dữ liệu (từ dòng 2 trở đi)
                     for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
                         for cell in row:
+                            cell.border = thin_border
+                            
                             if cell.column_letter in ['F', 'G']:
                                 cell.alignment = Alignment(wrap_text=True, vertical="center", horizontal="left")
                             elif cell.column_letter == 'B':
@@ -857,6 +886,8 @@ class RenPyTranslatorApp:
 
         self.btn_merge = ttk.Button(self.merge_lf, text="", command=self.process_merge)
         self.btn_merge.pack(fill='x', padx=10, pady=25, ipady=5)
+
+        
 
     def browse_excel_file(self):
         f = filedialog.askopenfilename(
