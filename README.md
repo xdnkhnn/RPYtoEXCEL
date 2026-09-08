@@ -1,12 +1,16 @@
-# Ren'Py Translation Tool
+# Ren'Py RPY to Excel Translator Tool
 
-GUI tool for extracting Ren'Py `.rpy` translation files into formatted Excel spreadsheets and merging them back into game scripts seamlessly.
+A lightweight GUI utility designed to extract Ren'Py `.rpy` script files into formatted Excel spreadsheets and seamlessly merge translations back into your game code without breaking syntax.
+
+---
 
 ## Key Features
 
-* **Multi-Language UI:** Built-in support for 16 languages (English, Vietnamese, Spanish, Chinese, French, German, Japanese, Russian, etc.).
-* **Folder & Subdirectory Processing:** Supports recursive folder scanning (`.rpy` files located deep inside nested subdirectories are automatically detected and updated).
-* **Excel Formatting & Progress Tracking:** Exports structured Excel Tables with clean gridlines, auto-fitted columns, and built-in formulas in the `Notes` sheet to track translation completion (% progress).
+* **RPY to Excel Extraction:** Automatically parses dialogue lines, `label` blocks, and original file paths from `.rpy` files into organized Excel tables.
+* **Automated Translation Merging:** Safely merges translated text from the `Translated` column back into your `.rpy` script files.
+* **Recursive Folder Scanning:** Automatically searches and detects `.rpy` files located deep inside nested subdirectories.
+* **Progress Tracking Sheet:** Generates an automated `Notes` tab with Excel formulas to track completion progress (%) per file and for the entire project.
+* **Multi-Language UI:** Built-in localization support for 16 languages (English, Vietnamese, Spanish, Chinese, French, German, Japanese, Russian, etc.).
 
 ---
 
@@ -15,12 +19,12 @@ GUI tool for extracting Ren'Py `.rpy` translation files into formatted Excel spr
 1. Download `app.exe` or `app.zip` from [Releases](https://github.com/xdnkhnn/RenPyTranslatorApp/releases).
 2. **Export (RPY -> Excel):**
    * Open the app and select your preferred language.
-   * Add individual `.rpy` files or use **Add Folder...** to scan subdirectories automatically.
-   * Click **START EXPORT TO EXCEL** to generate the `.xlsx` file.
-3. Fill in your translations under the `Translated` column in Excel.
+   * Select individual `.rpy` files or click **Add Folder...** to scan subdirectories automatically.
+   * Click **START EXPORT TO EXCEL** to generate your `.xlsx` file.
+3. Fill in your translations under the **`Translated`** column in Excel.
 4. **Merge (Excel -> RPY):**
    * Switch to the **Merge Excel -> RPY** tab.
-   * Select your translated Excel file and the target `.rpy` game directory.
+   * Select your translated Excel file and your target `.rpy` game folder.
    * Click **START MERGING TRANSLATIONS**.
 
 ---
