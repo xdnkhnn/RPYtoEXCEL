@@ -1,94 +1,261 @@
-# RPYtoEXCEL - Ren'Py Translation Tool
+RPYtoEXCEL
 
-RPYtoEXCEL is a desktop utility designed to streamline the translation process for Ren'Py games. It extracts dialogue, character tags, and string blocks from script files (.rpy) into organized Excel spreadsheets (.xlsx), and merges translated text back into the game script.
+A simple desktop tool for Ren'Py game translation.
 
----
+RPYtoEXCEL helps translation teams move text between Ren'Py .rpy scripts and Excel:
 
-## Features
+.rpy → .xlsx → translate → .xlsx → .rpy
 
-* Smart Extraction (Export RPY -> Excel):
-  * Scans and extracts dialogues, character tags, strings, and old/new translation blocks from .rpy files.
-  * Generates formatted Excel spreadsheets with auto-fitted columns, centered headers, and separate sheets for each script.
-  * Creates an automatic Notes/Summary sheet with real-time translation progress tracking.
-* Flexible Merging (Merge Excel -> RPY):
-  * Merges translations back into individual .rpy files or full game directories based on line index.
-  * Recognizes translation column names dynamically across multiple languages.
-* User Interface:
-  * Drag and Drop support for files (.rpy, .xlsx) and folders.
-  * Multilingual UI supporting 16 languages.
+The application uses a graphical interface built with Tkinter and supports drag-and-drop when tkinterdnd2 is installed.
 
----
+Features
 
-## Output Excel Structure
+Export translatable text from .rpy files to Excel.
 
-The generated Excel file contains the following columns for each script sheet:
+Import/merge translated Excel files back into .rpy files.
 
-|Column|Name|Description|
-|---|---|---|
-|A|File|Name of the source script file|
-|B|Line|Line number of the string in the original script|
-|C|Original Location|Script filepath and location reference|
-|D|Label|Ren'Py translation label name|
-|E|Tag Char|Speaker character ID / tag|
-|F|Original|Original untranslated text|
-|G|Translated|Column where translations should be entered|
-|H|Notes|Optional notes for translators|
+Select individual .rpy files or entire folders.
 
----
+Recursively scan folders for .rpy files.
 
-## Installation & Setup
+Drag and drop .rpy files/folders.
 
-#&3 1. Prerequisites
-* Python 3.8 or higher.
+Drag and drop translated Excel files.
 
-### 2. Install Dependencies
-Start your Terminal or Command Prompt and run:
+Keep original file name and line number information.
 
- ``bash
+Detect Ren'Py translate blocks.
+
+Handle old / new translation pairs.
+
+Include character/tag information when available.
+
+Add an Addition sheet for extra translation entries.
+
+Generate a Notes sheet with translation progress.
+
+Automatically format Excel sheets as tables.
+
+Multilingual interface with 16 languages.
+
+Supported Interface Languages
+
+English
+
+Tiếng Việt
+
+Español
+
+中文
+
+Deutsch
+
+Français
+
+Bahasa Indonesia
+
+العربية
+
+Türkçe
+
+Português
+
+Polski
+
+Русский
+
+Українська
+
+日本語
+
+한국어
+
+Italiano
+
+Requirements
+
+Python 3
+
+pandas
+
+openpyxl
+
+tkinter / tkinter.ttk
+
+tkinterdnd2 (optional, for drag-and-drop support)
+
+Install dependencies
+
 pip install pandas openpyxl tkinterdnd2
- ```
 
-### 3. Run from Source
- ``bash
+On some Linux distributions, Tkinter may need to be installed separately.
+
+Usage
+
+Run the application:
+
 python RPYtoEXCEL.py
- ```J
 
----
+1. Export RPY → Excel
 
-## Usage Guide
+Open the Export RPY -> Excel tab.
 
-### 1. Extracting Text (Export Tab)
-1. Add .rpy files or drag and drop your game directory into the application.
-2. Click START EXPORT TO EXCEL and choose a save location.
-3. Open the generated .xlsx file and fill in your translations in the Translated column.
+Add .rpy files, or add a folder containing .rpy files.
 
-### 2. Applying Translations (Merge Tab)
-1. Drag and drop the translated Excel file into Step 1.
-2. Drag and drop the target .rpy files or game folder into Step 2.
-3. Click START MERGING TRANSLATIONS.
+You can also drag and drop files/folders into the list.
 
----
+Click Start Export to Excel.
 
-## Important Notes & Troubleshooting
+Choose where to save the .xlsx file.
 
-* Line Numbers: Do not modify the Line column (Column B) in Excel,5as the tool relies on line indexing to place translations back into .rpy files correctly.
-* Double Quotes: Preserve internal formatting tags (such as {w}, {p}, [player_name]) and escape quotes (\") inside your translated text.
-* Admin Privilege Issue: If drag-and-drop does not work on Windows, ensure the application is NOT running as Administrator (Windows blocks drag-and-drop from standard File Explorer to elevated processes).
+The generated workbook contains translation data such as:
 
----
+Column
 
-## Building Executable (.exe)
+Description
 
-To package the tool into a standalone Windows executable:
+File
 
- ``bash
-pip install pyinstaller
-bython -m PyInstaller --noconsole --onefile --collect-data tkinterdnd2 -n RPYtoEXCEL RPYtoEXCEL.py
- ``a
+Original .rpy file
 
-The output file will be saved in the dist/ directory.
+Line
 
----
+Source line number
 
-## License
-Distributed under the MIT License.
+Original Location
+
+Detected # game/... location
+
+Label
+
+Detected Ren'Py translate label
+
+Tag Char
+
+Character/tag information when available
+
+Original
+
+Original text
+
+Translated
+
+Translation
+
+Notes
+
+Notes for translators
+
+The workbook also contains a notes/progress sheet and an Addition sheet.
+
+2. Translate the Excel file
+
+Open the generated .xlsx file in Excel, LibreOffice Calc, Google Sheets, or another compatible spreadsheet application.
+
+Put your translation in the Translated column (or the equivalent translated column for the selected interface language).
+
+Do not change the File and Line information unless you know exactly what you are doing, because these values are used to locate the original text when merging.
+
+3. Merge Excel → RPY
+
+Open the Merge Excel -> RPY tab.
+
+Select the translated .xlsx file.
+
+Add the target .rpy files or a folder containing them.
+
+Click Start Merging Translations.
+
+The program matches translation entries using the .rpy file name and line number, then writes the translated text back into the target .rpy files.
+
+Excel Compatibility
+
+The merge function recognizes translated/original/file/line column names used by the supported interface languages, so an exported workbook can be processed even after changing the application's interface language.
+
+The Notes-style sheets are ignored during the merge process.
+
+Drag & Drop
+
+Drag-and-drop support is optional.
+
+If tkinterdnd2 is unavailable, the application still works normally through the file/folder selection buttons.
+
+Install it with:
+
+pip install tkinterdnd2
+
+Important Notes
+
+Back up your .rpy files before merging translations.
+
+The program writes changes directly to the selected target .rpy files.
+
+The tool reads .rpy files using UTF-8 encoding.
+
+Only use the merge function on the intended game files.
+
+Always test the game after merging translations.
+
+Ren'Py syntax and special characters can affect whether a translated line works correctly.
+
+If a translation contains characters that are meaningful to Ren'Py or Python strings, make sure they are escaped/handled correctly.
+
+Project Structure
+
+A minimal setup can look like:
+
+RPYtoEXCEL/
+├── RPYtoEXCEL.py
+└── README.md
+
+How It Works
+
+Export
+
+Ren'Py .rpy files
+       │
+       ▼
+  RPYtoEXCEL
+       │
+       ▼
+   Excel .xlsx
+       │
+       ▼
+  Translator edits
+  "Translated" column
+
+Merge
+
+Translated Excel
+       │
+       ▼
+  RPYtoEXCEL
+       │
+       ▼
+Match File + Line
+       │
+       ▼
+Updated .rpy files
+       │
+       ▼
+   Test in game
+
+Tech Stack
+
+Python
+
+Tkinter — graphical user interface
+
+pandas — spreadsheet/data processing
+
+openpyxl — Excel workbook creation and formatting
+
+tkinterdnd2 — optional drag-and-drop support
+
+Status
+
+This is a practical tool for Ren'Py translation workflows. It is intended to make extracting, translating, and reinserting game dialogue easier for translation teams.
+
+License
+
+Add your preferred license here before publishing the project publicly.
