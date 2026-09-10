@@ -12,9 +12,7 @@ The application uses a graphical interface built with Tkinter and supports drag-
 
 You can download the latest version from the GitHub Releases page:
 
-[![Latest Release](https://img.shields.io/github/v/release/xdnkhnn/RenPyTranslatorApp?label=Latest%20Release)](https://github.com/xdnkhnn/RenPyTranslatorApp/releases/latest)
-
-👉 **[Download the latest release](https://github.com/xdnkhnn/RenPyTranslatorApp/releases/latest)**
+**[Download the latest release](https://github.com/xdnkhnn/RenPyTranslatorApp/releases/latest)**
 
 ## Features
 
