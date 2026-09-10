@@ -23,31 +23,35 @@ RPYtoEXCEL is a desktop utility designed to streamline the translation process f
 
 The generated Excel file contains the following columns for each script sheet:
 
-| Column | Name | Description |
-| --- | --- | --- |
-| A | File | Name of the source script file |
-| B | Line | Line number of the string in the original script |
-| C | Original Location | Script filepath and location reference |
-| D | Label | Ren'Py translation label name |
-| E | Tag Char | Speaker character ID / tag |
-| F | Original | Original untranslated text |
-| G | Translated | Column where translations should be entered |
-| H | Notes | Optional notes for translators |
+|Column|Name|Description|
+|---|---|---|
+|A|File|Name of the source script file|
+|B|Line|Line number of the string in the original script|
+|C|Original Location|Script filepath and location reference|
+|D|Label|Ren'Py translation label name|
+|E|Tag Char|Speaker character ID / tag|
+|F|Original|Original untranslated text|
+|G|Translated|Column where translations should be entered|
+|H|Notes|Optional notes for translators|
 
 ---
 
 ## Installation & Setup
 
-### 1. Prerequisites
+#&3 1. Prerequisites
 * Python 3.8 or higher.
 
 ### 2. Install Dependencies
-Open your Terminal or Command Prompt and run:
+Start your Terminal or Command Prompt and run:
 
+ ``bash
 pip install pandas openpyxl tkinterdnd2
+ ```
 
 ### 3. Run from Source
+ ``bash
 python RPYtoEXCEL.py
+ ```J
 
 ---
 
@@ -67,7 +71,7 @@ python RPYtoEXCEL.py
 
 ## Important Notes & Troubleshooting
 
-* Line Numbers: Do not modify the Line column (Column B) in Excel, as the tool relies on line indexing to place translations back into .rpy files correctly.
+* Line Numbers: Do not modify the Line column (Column B) in Excel,5as the tool relies on line indexing to place translations back into .rpy files correctly.
 * Double Quotes: Preserve internal formatting tags (such as {w}, {p}, [player_name]) and escape quotes (\") inside your translated text.
 * Admin Privilege Issue: If drag-and-drop does not work on Windows, ensure the application is NOT running as Administrator (Windows blocks drag-and-drop from standard File Explorer to elevated processes).
 
@@ -77,8 +81,10 @@ python RPYtoEXCEL.py
 
 To package the tool into a standalone Windows executable:
 
+ ``bash
 pip install pyinstaller
-python -m PyInstaller --noconsole --onefile --collect-data tkinterdnd2 -n RPYtoEXCEL RPYtoEXCEL.py
+bython -m PyInstaller --noconsole --onefile --collect-data tkinterdnd2 -n RPYtoEXCEL RPYtoEXCEL.py
+ ``a
 
 The output file will be saved in the dist/ directory.
 
