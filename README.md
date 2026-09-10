@@ -44,40 +44,45 @@ The generated Excel file contains the following columns for each script sheet:
 ### 2. Install Dependencies
 Open your Terminal or Command Prompt and run:
 
-```bash
 pip install pandas openpyxl tkinterdnd2
-3. Run from Source
-Bash
+
+### 3. Run from Source
 python RPYtoEXCEL.py
-Usage Guide
-1. Extracting Text (Export Tab)
-Add .rpy files or drag and drop your game directory into the application.
 
-Click START EXPORT TO EXCEL and choose a save location.
+---
 
-Open the generated .xlsx file and fill in your translations in the Translated column.
+## Usage Guide
 
-2. Applying Translations (Merge Tab)
-Drag and drop the translated Excel file into Step 1.
+### 1. Extracting Text (Export Tab)
+1. Add .rpy files or drag and drop your game directory into the application.
+2. Click START EXPORT TO EXCEL and choose a save location.
+3. Open the generated .xlsx file and fill in your translations in the Translated column.
 
-Drag and drop the target .rpy files or game folder into Step 2.
+### 2. Applying Translations (Merge Tab)
+1. Drag and drop the translated Excel file into Step 1.
+2. Drag and drop the target .rpy files or game folder into Step 2.
+3. Click START MERGING TRANSLATIONS.
 
-Click START MERGING TRANSLATIONS.
+---
 
-Important Notes & Troubleshooting
-Line Numbers: Do not modify the Line column (Column B) in Excel, as the tool relies on line indexing to place translations back into .rpy files correctly.
+## Important Notes & Troubleshooting
 
-Double Quotes: Preserve internal formatting tags (such as {w}, {p}, [player_name]) and escape quotes (\") inside your translated text.
+* Line Numbers: Do not modify the Line column (Column B) in Excel, as the tool relies on line indexing to place translations back into .rpy files correctly.
+* Double Quotes: Preserve internal formatting tags (such as {w}, {p}, [player_name]) and escape quotes (\") inside your translated text.
+* Admin Privilege Issue: If drag-and-drop does not work on Windows, ensure the application is NOT running as Administrator (Windows blocks drag-and-drop from standard File Explorer to elevated processes).
 
-Admin Privilege Issue: If drag-and-drop does not work on Windows, ensure the application is NOT running as Administrator (Windows blocks drag-and-drop from standard File Explorer to elevated processes).
+---
 
-Building Executable (.exe)
+## Building Executable (.exe)
+
 To package the tool into a standalone Windows executable:
 
-Bash
 pip install pyinstaller
 python -m PyInstaller --noconsole --onefile --collect-data tkinterdnd2 -n RPYtoEXCEL RPYtoEXCEL.py
+
 The output file will be saved in the dist/ directory.
 
-License
+---
+
+## License
 Distributed under the MIT License.
