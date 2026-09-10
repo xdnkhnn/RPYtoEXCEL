@@ -1,46 +1,31 @@
-# RPYtoEXCEL
+# RPYtoEXCEL - Ren'Py Translation Tool
 
-A lightweight GUI utility designed to extract Ren'Py `.rpy` script files into formatted Excel spreadsheets and seamlessly merge translations back into your game code without breaking syntax.
-
----
-
-## Key Features
-
-* **RPY to Excel Extraction:** Automatically parses dialogue lines, `label` blocks, and original file paths from `.rpy` files into organized Excel tables.
-* **Automated Translation Merging:** Safely merges translated text from the `Translated` column back into your `.rpy` script files.
-* **Recursive Folder Scanning:** Automatically searches and detects `.rpy` files located deep inside nested subdirectories.
-* **Progress Tracking Sheet:** Generates an automated `Notes` tab with Excel formulas to track completion progress (%) per file and for the entire project.
-* **Multi-Language UI:** Built-in localization support for 16 languages (English, Vietnamese, Spanish, Chinese, French, German, Japanese, Russian, etc.).
+RPYtoEXCEL is a utility designed to extract translation dialogue and strings from Ren'Py script files (.rpy) into Excel spreadsheets (.xlsx) for easy translation, and merge the translated text back into the game scripts.
 
 ---
 
-## How to Use
+## Features
 
-1. Download `RPYtoEXCEL.exe` or `RPYtoEXCEL.zip` from [Releases](https://github.com/xdnkhnn/RenPyTranslatorApp/releases).
-2. **Export (RPY -> Excel):**
-   * Open the app and select your preferred language.
-   * Select individual `.rpy` files or click **Add Folder...** to scan subdirectories automatically.
-   * Click **START EXPORT TO EXCEL** to generate your `.xlsx` file.
-3. Fill in your translations under the **`Translated`** column in Excel.
-4. **Merge (Excel -> RPY):**
-   * Switch to the **Merge Excel -> RPY** tab.
-   * Select your translated Excel file and your target `.rpy` game folder.
-   * Click **START MERGING TRANSLATIONS**.
+* Smart Extraction (Export RPY -> Excel):
+  * Scans and extracts dialogues, character tags, strings, and old/new translation blocks from .rpy files.
+  * Generates structured Excel spreadsheets with centered headers, auto-adjusted column widths, and separate sheets for each script file.
+  * Automatically creates a Notes sheet with a progress tracking table.
+* Flexible Merging (Merge Excel -> RPY):
+  * Supports merging translations back into individual .rpy files or entire game directories.
+  * Dynamically recognizes translation column names across various languages.
+* User Interface:
+  * Drag and Drop support for files (.rpy, .xlsx) and directories.
+  * Multilingual UI supporting 16 languages.
 
 ---
 
-## Build from Source
+## Installation & Setup
+
+### 1. Prerequisites
+* Python 3.8 or higher.
+
+### 2. Install Required Libraries
+Open your Terminal or Command Prompt and run:
 
 ```bash
-# Clone repository
-git clone [https://github.com/xdnkhnn/RenPyTranslatorApp.git](https://github.com/xdnkhnn/RenPyTranslatorApp.git)
-cd RenPyTranslatorApp
-
-# Install dependencies
-pip install pandas openpyxl pyinstaller
-
-# Run application
-python RPYtoEXCEL.py
-
-# Build single executable (.exe)
-python -m PyInstaller --noconsole --onefile RPYtoEXCEL.py
+pip install pandas openpyxl tkinterdnd2
