@@ -8,6 +8,14 @@ RPYtoEXCEL helps translation teams move text between Ren'Py `.rpy` scripts and E
 
 The application uses a graphical interface built with Tkinter and supports drag-and-drop when `tkinterdnd2` is installed.
 
+## Download
+
+You can download the latest version from the GitHub Releases page:
+
+[![Latest Release](https://img.shields.io/github/v/release/xdnkhnn/RenPyTranslatorApp?label=Latest%20Release)](https://github.com/xdnkhnn/RenPyTranslatorApp/releases/latest)
+
+👉 **[Download the latest release](https://github.com/xdnkhnn/RenPyTranslatorApp/releases/latest)**
+
 ## Features
 
 - Export translatable text from `.rpy` files to Excel.
