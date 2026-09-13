@@ -58,6 +58,7 @@ TRANSLATIONS = {
         "col_translated": "Translated",
         "col_notes": "Notes",
         "sheet_notes_name": "Notes",
+        "sheet_addition_name": "Addition",
         "progress_title": "Progress",
         "sum_title": "Sum"
     },
@@ -101,6 +102,7 @@ TRANSLATIONS = {
         "col_translated": "Bản dịch",
         "col_notes": "Ghi chú",
         "sheet_notes_name": "Lưu ý!",
+        "sheet_addition_name": "Bổ sung",
         "progress_title": "Tiến độ",
         "sum_title": "Tổng cộng"
     },
@@ -144,6 +146,7 @@ TRANSLATIONS = {
         "col_translated": "Traducción",
         "col_notes": "Notas",
         "sheet_notes_name": "Notas",
+        "sheet_addition_name": "Adicional",
         "progress_title": "Progreso",
         "sum_title": "Total"
     },
@@ -187,6 +190,7 @@ TRANSLATIONS = {
         "col_translated": "译文",
         "col_notes": "备注",
         "sheet_notes_name": "备注",
+        "sheet_addition_name": "补充",
         "progress_title": "进度",
         "sum_title": "总计"
     },
@@ -230,6 +234,7 @@ TRANSLATIONS = {
         "col_translated": "Übersetzung",
         "col_notes": "Notizen",
         "sheet_notes_name": "Notizen",
+        "sheet_addition_name": "Zusatz",
         "progress_title": "Fortschritt",
         "sum_title": "Gesamt"
     },
@@ -273,6 +278,7 @@ TRANSLATIONS = {
         "col_translated": "Traduction",
         "col_notes": "Notes",
         "sheet_notes_name": "Notes",
+        "sheet_addition_name": "Addition",
         "progress_title": "Progression",
         "sum_title": "Total"
     },
@@ -316,6 +322,7 @@ TRANSLATIONS = {
         "col_translated": "Terjemahan",
         "col_notes": "Catatan",
         "sheet_notes_name": "Catatan",
+        "sheet_addition_name": "Tambahan",
         "progress_title": "Kemajuan",
         "sum_title": "Total"
     },
@@ -359,6 +366,7 @@ TRANSLATIONS = {
         "col_translated": "الترجمة",
         "col_notes": "ملاحظات",
         "sheet_notes_name": "ملاحظات",
+        "sheet_addition_name": "إضافة",
         "progress_title": "التقدم",
         "sum_title": "المجموع"
     },
@@ -402,6 +410,7 @@ TRANSLATIONS = {
         "col_translated": "Çeviri",
         "col_notes": "Notlar",
         "sheet_notes_name": "Notlar",
+        "sheet_addition_name": "Ek",
         "progress_title": "İlerleme",
         "sum_title": "Toplam"
     },
@@ -445,6 +454,7 @@ TRANSLATIONS = {
         "col_translated": "Tradução",
         "col_notes": "Notas",
         "sheet_notes_name": "Notas",
+        "sheet_addition_name": "Adição",
         "progress_title": "Progresso",
         "sum_title": "Total"
     },
@@ -488,6 +498,7 @@ TRANSLATIONS = {
         "col_translated": "Tłumaczenie",
         "col_notes": "Notatki",
         "sheet_notes_name": "Notatki",
+        "sheet_addition_name": "Dodatek",
         "progress_title": "Postęp",
         "sum_title": "Suma"
     },
@@ -531,6 +542,7 @@ TRANSLATIONS = {
         "col_translated": "Перевод",
         "col_notes": "Заметки",
         "sheet_notes_name": "Заметки",
+        "sheet_addition_name": "Дополнение",
         "progress_title": "Прогресс",
         "sum_title": "Итого"
     },
@@ -574,6 +586,7 @@ TRANSLATIONS = {
         "col_translated": "Переклад",
         "col_notes": "Примітки",
         "sheet_notes_name": "Примітки",
+        "sheet_addition_name": "Доповнення",
         "progress_title": "Прогрес",
         "sum_title": "Всього"
     },
@@ -617,6 +630,7 @@ TRANSLATIONS = {
         "col_translated": "翻訳",
         "col_notes": "メモ",
         "sheet_notes_name": "メモ",
+        "sheet_addition_name": "追加",
         "progress_title": "進捗率",
         "sum_title": "合計"
     },
@@ -660,6 +674,7 @@ TRANSLATIONS = {
         "col_translated": "번역",
         "col_notes": "메모",
         "sheet_notes_name": "메모",
+        "sheet_addition_name": "추가",
         "progress_title": "진행률",
         "sum_title": "합계"
     },
@@ -693,7 +708,7 @@ TRANSLATIONS = {
         "dlg_select_folder": "Seleziona cartella",
         "warning": "Avviso",
         "success": "Successo",
-        "error": "Erro",
+        "error": "Errore",
         "col_file": "Nome File",
         "col_line": "Riga",
         "col_location": "Posizione Originale",
@@ -703,6 +718,7 @@ TRANSLATIONS = {
         "col_translated": "Traduzione",
         "col_notes": "Note",
         "sheet_notes_name": "Note",
+        "sheet_addition_name": "Aggiunta",
         "progress_title": "Progresso",
         "sum_title": "Totale"
     }
@@ -711,7 +727,7 @@ TRANSLATIONS = {
 class RPYtoEXCELApp:
     def __init__(self, root):
         self.root = root
-        self.current_lang = "English"
+        self.current_lang = "Tiếng Việt"
         
         self.root.title("RPYtoEXCEL")
         self.root.geometry("680x580")
@@ -796,7 +812,6 @@ class RPYtoEXCELApp:
         scrollbar.pack(side='right', fill='y')
         self.export_listbox.config(yscrollcommand=scrollbar.set)
 
-        # Đăng ký Kéo Thả
         if HAS_DND:
             self.export_listbox.drop_target_register(DND_FILES)
             self.export_listbox.dnd_bind('<<Drop>>', self.drop_export_files)
@@ -876,6 +891,7 @@ class RPYtoEXCELApp:
         ]
 
         notes_sheet_title = self.t("sheet_notes_name")
+        addition_sheet_title = self.t("sheet_addition_name")
 
         try:
             with pd.ExcelWriter(save_path, engine='openpyxl') as writer:
@@ -974,7 +990,7 @@ class RPYtoEXCELApp:
                                             translated_text = next_line_strip[t_start + 1 : t_end]
                                             break
 
-                                extracted_data.append([file_name, idx, current_game_location, current_label, "", english_text, translated_text, ""])
+                                extracted_data.append([file_name, idx, current_game_location, "strings", "", english_text, translated_text, ""])
 
                     if extracted_data:
                         df = pd.DataFrame(extracted_data, columns=columns)
@@ -984,8 +1000,11 @@ class RPYtoEXCELApp:
                         table_name = f"Bảng_{table_idx}"
                         table_mapping.append((sheet_name, table_name))
 
-                df_bo_sung = pd.DataFrame(columns=columns)
-                df_bo_sung.to_excel(writer, sheet_name="Addition", index=False)
+                # --- Tạo Sheet Addition (Bổ sung) chuẩn định dạng Excel Table ---
+                df_addition = pd.DataFrame(columns=columns)
+                df_addition.to_excel(writer, sheet_name=addition_sheet_title, index=False)
+                addition_table_name = f"Bảng_Addition"
+                table_mapping.append((addition_sheet_title, addition_table_name))
 
                 workbook = writer.book
 
@@ -1034,14 +1053,12 @@ class RPYtoEXCELApp:
                             max_len = 0
                             for cell in col:
                                 val_str = str(cell.value or '')
-                                if cell.row == 1:
-                                    val_len = len(val_str) + 6
-                                else:
-                                    val_len = len(val_str)
+                                val_len = len(val_str) + 6 if cell.row == 1 else len(val_str)
                                 if val_len > max_len:
                                     max_len = val_len
                             ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
 
+                # --- Lập báo cáo Tiến độ ở sheet Notes (LOẠI BỎ SHEET ADDITION KHỎI TIẾN ĐỘ) ---
                 ws_notes = workbook[notes_sheet_title]
                 cell_c3 = ws_notes.cell(row=3, column=3, value=self.t("col_file"))
                 cell_d3 = ws_notes.cell(row=3, column=4, value=self.t("progress_title"))
@@ -1056,7 +1073,9 @@ class RPYtoEXCELApp:
                 max_filename_len = len(self.t("col_file"))
 
                 start_row = 4
-                for idx, (sheet_name, table_name) in enumerate(table_mapping, start=start_row):
+                progress_table_mapping = [item for item in table_mapping if item[0] != addition_sheet_title]
+
+                for idx, (sheet_name, table_name) in enumerate(progress_table_mapping, start=start_row):
                     cell_file = ws_notes.cell(row=idx, column=3, value=sheet_name)
                     cell_file.alignment = Alignment(horizontal="center", vertical="center")
                     
@@ -1068,14 +1087,14 @@ class RPYtoEXCELApp:
                     cell_prog.number_format = '0.00%'
                     cell_prog.alignment = Alignment(horizontal="center", vertical="center")
 
-                sum_row = start_row + len(table_mapping)
+                sum_row = start_row + len(progress_table_mapping)
                 cell_sum_lbl = ws_notes.cell(row=sum_row, column=3, value=self.t("sum_title"))
                 cell_sum_lbl.font = Font(bold=True)
                 cell_sum_lbl.alignment = Alignment(horizontal="center", vertical="center")
                 
-                if table_mapping:
-                    trans_parts = [f"COUNTA({tname}[{col_trans_name}])" for _, tname in table_mapping]
-                    orig_parts = [f"COUNTA({tname}[{col_orig_name}])" for _, tname in table_mapping]
+                if progress_table_mapping:
+                    trans_parts = [f"COUNTA({tname}[{col_trans_name}])" for _, tname in progress_table_mapping]
+                    orig_parts = [f"COUNTA({tname}[{col_orig_name}])" for _, tname in progress_table_mapping]
                     sum_formula = f"=({' + '.join(trans_parts)})/({' + '.join(orig_parts)})"
                     
                     cell_sum = ws_notes.cell(row=sum_row, column=4)
@@ -1108,7 +1127,6 @@ class RPYtoEXCELApp:
         self.btn_browse_excel = ttk.Button(excel_box, text="", command=self.browse_excel_file)
         self.btn_browse_excel.pack(side='right')
 
-        # Đăng ký Kéo Thả Excel
         if HAS_DND:
             self.entry_excel.drop_target_register(DND_FILES)
             self.entry_excel.dnd_bind('<<Drop>>', self.drop_excel_file)
@@ -1126,7 +1144,6 @@ class RPYtoEXCELApp:
         scrollbar.pack(side='right', fill='y')
         self.merge_listbox.config(yscrollcommand=scrollbar.set)
 
-        # Đăng ký Kéo Thả Merge Listbox
         if HAS_DND:
             self.merge_listbox.drop_target_register(DND_FILES)
             self.merge_listbox.dnd_bind('<<Drop>>', self.drop_merge_files)
@@ -1207,52 +1224,48 @@ class RPYtoEXCELApp:
 
         rpy_file_map = {os.path.basename(f): f for f in target_rpy_files}
 
-        possible_translated_cols = {trans.get("col_translated", "").strip() for trans in TRANSLATIONS.values()}
-        possible_translated_cols.update({"Translated", "Bản dịch", "Traducción", "译文", "Übersetzung", "Traduction", "Terjemahan", "الترجمة", "Çeviri", "Tradução", "Tłumaczenie", "Перевод", "Переклад", "翻訳", "번역"})
+        possible_translated_cols = {"Translated", "Bản dịch", "Traducción", "译文", "Übersetzung", "Traduction", "Terjemahan", "الترجمة", "Çeviri", "Tradução", "Tłumaczenie", "Перевод", "Переклад", "翻訳", "번역"}
+        possible_original_cols = {"Original", "Bản gốc", "Văn bản gốc", "原文", "Texto Original", "Oryginał", "Оригинал", "Оригінал", "원문"}
+        possible_file_cols = {"File", "Tên File", "Archivo", "文件名", "Datei", "Fichier", "Nama Berkas", "اسم الملف", "Dosya Adı", "Nome do Arquivo", "Nazwa Pliku", "Имя файла", "Назва файлу", "ファイル名", "파일명", "Nome File"}
+        possible_label_cols = {"Label", "Nhãn (Label)", "Etiqueta", "标签", "Étiquette", "Rótulo", "Etykieta", "Метка", "Мітка", "ラベル", "라벨"}
+        possible_notes_sheets = {"Notes", "Ghi chú", "Lưu ý!", "Notas", "备注", "Notizen", "Catatan", "ملاحظات", "Notlar", "Notatki", "Заметки", "Примітки", "メモ", "메모"}
         
-        possible_original_cols = {trans.get("col_original", "").strip() for trans in TRANSLATIONS.values()}
-        possible_original_cols.update({"Original", "Bản gốc", "Văn bản gốc", "原文", "Texto Original", "Oryginał", "Оригинал", "Оригінал", "원문"})
-
-        possible_file_cols = {trans.get("col_file", "").strip() for trans in TRANSLATIONS.values()}
-        possible_file_cols.update({"File", "Tên File", "Archivo", "文件名", "Datei", "Fichier", "Nama Berkas", "اسم الملف", "Dosya Adı", "Nome do Arquivo", "Nazwa Pliku", "Имя файла", "Назва файлу", "ファイル名", "파일명", "Nome File"})
-
-        possible_line_cols = {trans.get("col_line", "").strip() for trans in TRANSLATIONS.values()}
-        possible_line_cols.update({"Line", "Dòng", "Línea", "行号", "Zeile", "Ligne", "Baris", "السطر", "Satır", "Linha", "Linia", "Строка", "Рядок", "行番号", "줄 번호", "Riga"})
-
-        # Tập hợp tất cả các tên sheet dạng 'Notes / Ghi chú' cần bỏ qua khi đọc merge
-        possible_notes_sheets = {trans.get("sheet_notes_name", "").strip() for trans in TRANSLATIONS.values()}
-        possible_notes_sheets.update({"Notes", "Ghi chú", "Notas", "备注", "Notizen", "Catatan", "ملاحظات", "Notlar", "Notatki", "Заметки", "Примітки", "メモ", "메모"})
+        # Danh sách tất cả các tên sheet Bổ sung trong 16 ngôn ngữ
+        possible_addition_sheets = {trans.get("sheet_addition_name", "").strip() for trans in TRANSLATIONS.values()}
+        possible_addition_sheets.update({"Addition", "Bổ sung", "Adicional", "补充", "Zusatz", "Tambahan", "إضافة", "Ek", "Adição", "Dodatek", "Дополнение", "Доповнення", "追加", "추가", "Aggiunta"})
 
         try:
             excel_sheets = pd.read_excel(excel_file, sheet_name=None, engine="openpyxl")
-            translations = {}
+            
+            dialogue_trans = {}
+            string_trans = {}
+            addition_trans = {} # Cấu trúc: { file_name: [ (original_text, translated_text), ... ] }
 
             for sheet_name, df in excel_sheets.items():
-                if sheet_name.strip() in possible_notes_sheets:
+                sheet_name_clean = sheet_name.strip()
+                if sheet_name_clean in possible_notes_sheets:
                     continue
 
                 df.columns = [str(col).strip() for col in df.columns]
 
                 file_col = next((c for c in df.columns if c in possible_file_cols), df.columns[0])
-                line_col = next((c for c in df.columns if c in possible_line_cols), df.columns[1])
+                label_col = next((c for c in df.columns if c in possible_label_cols), df.columns[3] if len(df.columns) > 3 else None)
                 orig_col = next((c for c in df.columns if c in possible_original_cols), df.columns[5] if len(df.columns) > 5 else None)
                 trans_col = next((c for c in df.columns if c in possible_translated_cols), df.columns[6] if len(df.columns) > 6 else None)
+
+                is_addition_sheet = sheet_name_clean in possible_addition_sheets
 
                 for _, row in df.iterrows():
                     file_name = str(row.get(file_col, "")).strip()
                     if not file_name or file_name == "nan":
-                        if sheet_name not in {"Addition", "Bổ sung"}:
+                        if not is_addition_sheet:
                             file_name = f"{sheet_name}.rpy" if not sheet_name.endswith(".rpy") else sheet_name
                         else:
                             continue
 
-                    line_val = row.get(line_col, "")
-                    if pd.isna(line_val):
-                        continue
-                    try:
-                        line_no = int(float(line_val))
-                    except ValueError:
-                        continue
+                    label_val = str(row.get(label_col, "")).strip() if label_col else ""
+                    if label_val == "nan":
+                        label_val = ""
 
                     orig_val = row.get(orig_col, "") if orig_col else ""
                     original_text = "" if pd.isna(orig_val) else str(orig_val).strip()
@@ -1260,20 +1273,30 @@ class RPYtoEXCELApp:
                     trans_val = row.get(trans_col, "") if trans_col else ""
                     translated_text = "" if pd.isna(trans_val) else str(trans_val).strip()
 
+                    if not original_text or not translated_text:
+                        continue
+
                     if original_text.startswith('"') and original_text.endswith('"') and len(original_text) >= 2:
                         original_text = original_text[1:-1]
                     if translated_text.startswith('"') and translated_text.endswith('"') and len(translated_text) >= 2:
                         translated_text = translated_text[1:-1]
 
-                    translations[(file_name, line_no)] = {
-                        "original": original_text,
-                        "translated": translated_text
-                    }
+                    if is_addition_sheet:
+                        if not file_name.endswith(".rpy"):
+                            file_name += ".rpy"
+                        if file_name not in addition_trans:
+                            addition_trans[file_name] = []
+                        addition_trans[file_name].append((original_text, translated_text))
+                    else:
+                        if label_val == "strings" or not label_val:
+                            string_trans[(file_name, original_text)] = translated_text
+                        else:
+                            dialogue_trans[(file_name, label_val, original_text)] = translated_text
 
-            all_files = {k[0] for k in translations.keys()}
             updated_count = 0
+            all_target_files = set(rpy_file_map.keys())
 
-            for file_name in all_files:
+            for file_name in all_target_files:
                 file_path = rpy_file_map.get(file_name)
                 if not file_path or not os.path.exists(file_path):
                     continue
@@ -1281,79 +1304,107 @@ class RPYtoEXCELApp:
                 with open(file_path, "r", encoding="utf-8") as f:
                     lines = f.readlines()
 
-                file_trans = {k[1]: v for k, v in translations.items() if k[0] == file_name}
-                if not file_trans:
-                    continue
-
-                max_line_excel = max(file_trans.keys())
-                while len(lines) < max_line_excel + 5:
-                    lines.append("\n")
-
                 new_lines = list(lines)
+                is_file_modified = False
 
-                for line_num, data in sorted(file_trans.items()):
-                    orig = data["original"]
-                    trans = data["translated"]
-                    
-                    if not orig and not trans:
-                        continue
+                # 1. MERGE THOẠI & STRINGS CÓ SẴN
+                current_label = ""
+                i = 0
+                while i < len(new_lines):
+                    line_strip = new_lines[i].strip()
 
-                    idx = line_num - 1
-                    line_content = new_lines[idx].strip()
+                    if line_strip.startswith("translate ") and line_strip.endswith(":"):
+                        parts = line_strip.split()
+                        if len(parts) >= 3:
+                            current_label = parts[2].replace(":", "").strip()
 
-                    if line_content.startswith("old "):
-                        indent = new_lines[idx][:new_lines[idx].find("old")]
-                        if orig:
-                            new_lines[idx] = f'{indent}old "{orig}"\n'
+                    elif line_strip.startswith("#") and '"' in line_strip and current_label:
+                        first_q = line_strip.find('"')
+                        last_q = line_strip.rfind('"')
+                        if first_q != last_q:
+                            orig_text = line_strip[first_q + 1 : last_q]
+                            trans_text = dialogue_trans.get((file_name, current_label, orig_text))
+                            if trans_text:
+                                for offset in range(1, 4):
+                                    next_idx = i + offset
+                                    if next_idx >= len(new_lines):
+                                        break
+                                    target_line = new_lines[next_idx]
+                                    target_strip = target_line.strip()
+                                    if target_strip.startswith("#") or target_strip.startswith("translate"):
+                                        break
+                                    if '"' in target_strip:
+                                        t_start = target_line.find('"')
+                                        t_end = target_line.rfind('"')
+                                        if t_start != t_end:
+                                            prefix = target_line[:t_start + 1]
+                                            suffix = target_line[t_end:]
+                                            new_lines[next_idx] = f"{prefix}{trans_text}{suffix}"
+                                            is_file_modified = True
+                                            break
+
+                    elif line_strip.startswith("old") and '"' in line_strip:
+                        first_q = line_strip.find('"')
+                        last_q = line_strip.rfind('"')
+                        if first_q != last_q:
+                            orig_text = line_strip[first_q + 1 : last_q]
+                            trans_text = string_trans.get((file_name, orig_text))
+                            if not trans_text:
+                                for (fname, otext), ttext in string_trans.items():
+                                    if otext == orig_text:
+                                        trans_text = ttext
+                                        break
+                            if trans_text:
+                                if i + 1 < len(new_lines) and new_lines[i + 1].strip().startswith("new"):
+                                    next_line = new_lines[i + 1]
+                                    t_start = next_line.find('"')
+                                    t_end = next_line.rfind('"')
+                                    if t_start != t_end:
+                                        prefix = next_line[:t_start + 1]
+                                        suffix = next_line[t_end:]
+                                        new_lines[i + 1] = f"{prefix}{trans_text}{suffix}"
+                                        is_file_modified = True
+                                else:
+                                    indent = new_lines[i][:new_lines[i].find("old")]
+                                    new_lines.insert(i + 1, f'{indent}new "{trans_text}"\n')
+                                    is_file_modified = True
+                    i += 1
+
+                # 2. CHÈN BỔ SUNG TỪ SHEET ADDITION VÀO CUỐI FILE (+2 DÒNG) - NHẬN DIỆN NGÔN NGỮ ĐỘNG
+                if file_name in addition_trans:
+                    adds = addition_trans[file_name]
+                    if adds:
+                        detected_lang = ""
+                        for line in lines:
+                            line_s = line.strip()
+                            if line_s.startswith("translate ") and ":" in line_s:
+                                parts = line_s.split()
+                                if len(parts) >= 3 and parts[1] != "strings":
+                                    detected_lang = parts[1]
+                                    break
+                                elif len(parts) >= 2 and parts[1] == "strings":
+                                    break
+
+                        while len(new_lines) > 0 and new_lines[-1].strip() == "":
+                            new_lines.pop()
                         
-                        if idx + 1 < len(new_lines) and new_lines[idx + 1].strip().startswith("new "):
-                            next_indent = new_lines[idx + 1][:new_lines[idx + 1].find("new")]
-                            if trans:
-                                new_lines[idx + 1] = f'{next_indent}new "{trans}"\n'
+                        new_lines.append("\n\n")
+                        
+                        if detected_lang:
+                            new_lines.append(f"translate {detected_lang} strings:\n")
                         else:
-                            if trans:
-                                new_lines.insert(idx + 1, f'{indent}new "{trans}"\n')
+                            new_lines.append("translate strings:\n")
+                            
+                        for orig_text, trans_text in adds:
+                            new_lines.append(f'    old "{orig_text}"\n')
+                            new_lines.append(f'    new "{trans_text}"\n')
+                        
+                        is_file_modified = True
 
-                    elif line_content.startswith("#"):
-                        if orig and '"' in new_lines[idx]:
-                            first_q = new_lines[idx].find('"')
-                            last_q = new_lines[idx].rfind('"')
-                            if first_q != -1 and last_q > first_q:
-                                new_lines[idx] = f'{new_lines[idx][:first_q + 1]}{orig}{new_lines[idx][last_q:]}'
-
-                        if trans and idx + 1 < len(new_lines):
-                            next_l = new_lines[idx + 1]
-                            if '"' in next_l:
-                                first_q = next_l.find('"')
-                                last_q = next_l.rfind('"')
-                                if first_q != -1 and last_q >= first_q:
-                                    prefix = next_l[:first_q + 1]
-                                    suffix = next_l[last_q:] if last_q > first_q else '"\n'
-                                    new_lines[idx + 1] = f'{prefix}{trans}{suffix}'
-
-                    elif line_content == "" or not ('"' in line_content):
-                        indent = "    "
-                        if orig and trans:
-                            new_lines[idx] = f'{indent}old "{orig}"\n'
-                            if idx + 1 < len(new_lines) and new_lines[idx + 1].strip().startswith("new "):
-                                new_lines[idx + 1] = f'{indent}new "{trans}"\n'
-                            else:
-                                new_lines.insert(idx + 1, f'{indent}new "{trans}"\n')
-                        elif trans:
-                            new_lines[idx] = f'{indent}"{trans}"\n'
-
-                    elif '"' in line_content:
-                        first_q = new_lines[idx].find('"')
-                        last_q = new_lines[idx].rfind('"')
-                        if first_q != -1 and last_q >= first_q:
-                            prefix = new_lines[idx][:first_q + 1]
-                            suffix = new_lines[idx][last_q:] if last_q > first_q else '"\n'
-                            if trans:
-                                new_lines[idx] = f'{prefix}{trans}{suffix}'
-
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.writelines(new_lines)
-                updated_count += 1
+                if is_file_modified:
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        f.writelines(new_lines)
+                    updated_count += 1
 
             messagebox.showinfo(self.t("success"), self.t("msg_success_merge").format(updated_count))
 
