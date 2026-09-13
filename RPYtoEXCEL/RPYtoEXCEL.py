@@ -727,7 +727,7 @@ TRANSLATIONS = {
 class RPYtoEXCELApp:
     def __init__(self, root):
         self.root = root
-        self.current_lang = "Tiếng Việt"
+        self.current_lang = "English"
         
         self.root.title("RPYtoEXCEL")
         self.root.geometry("680x580")
