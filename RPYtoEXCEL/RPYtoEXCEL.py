@@ -1238,6 +1238,8 @@ class RPYtoEXCELApp:
             excel_sheets = pd.read_excel(excel_file, sheet_name=None, engine="openpyxl")
             
             dialogue_trans = {}
+            dialogue_label_trans = {}
+            ambiguous_labels = set()
             string_trans = {}
             addition_trans = {} # Cấu trúc: { file_name: [ (original_text, translated_text), ... ] }
 
@@ -1268,12 +1270,12 @@ class RPYtoEXCELApp:
                         label_val = ""
 
                     orig_val = row.get(orig_col, "") if orig_col else ""
-                    original_text = "" if pd.isna(orig_val) else str(orig_val).strip()
+                    original_text = "" if pd.isna(orig_val) else str(orig_val)
 
                     trans_val = row.get(trans_col, "") if trans_col else ""
-                    translated_text = "" if pd.isna(trans_val) else str(trans_val).strip()
+                    translated_text = "" if pd.isna(trans_val) else str(trans_val)
 
-                    if not original_text or not translated_text:
+                    if not original_text.strip() or not translated_text.strip():
                         continue
 
                     if original_text.startswith('"') and original_text.endswith('"') and len(original_text) >= 2:
@@ -1291,6 +1293,14 @@ class RPYtoEXCELApp:
                         if label_val == "strings" or not label_val:
                             string_trans[(file_name, original_text)] = translated_text
                         else:
+                            # Label có giá trị: ưu tiên ghép bằng file + label, không phụ thuộc câu gốc.
+                            # Nếu một label xuất hiện nhiều lần với bản dịch khác nhau, đánh dấu mơ hồ.
+                            label_key = (file_name, label_val)
+                            if label_key in dialogue_label_trans and dialogue_label_trans[label_key] != translated_text:
+                                ambiguous_labels.add(label_key)
+                            else:
+                                dialogue_label_trans[label_key] = translated_text
+                            # Giữ khóa cũ làm phương án dự phòng khi label bị trùng/mơ hồ.
                             dialogue_trans[(file_name, label_val, original_text)] = translated_text
 
             updated_count = 0
@@ -1323,7 +1333,16 @@ class RPYtoEXCELApp:
                         last_q = line_strip.rfind('"')
                         if first_q != last_q:
                             orig_text = line_strip[first_q + 1 : last_q]
-                            trans_text = dialogue_trans.get((file_name, current_label, orig_text))
+                            label_key = (file_name, current_label)
+                            if current_label == "strings":
+                                # Ren'Py strings are matched by their original text.
+                                trans_text = string_trans.get((file_name, orig_text))
+                            elif label_key not in ambiguous_labels:
+                                # Other translation labels are matched by label only.
+                                trans_text = dialogue_label_trans.get(label_key)
+                            else:
+                                # A duplicate label with conflicting translations is unsafe to merge.
+                                trans_text = None
                             if trans_text:
                                 for offset in range(1, 4):
                                     next_idx = i + offset
