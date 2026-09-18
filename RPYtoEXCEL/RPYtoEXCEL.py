@@ -1,3 +1,5 @@
+#build syntax: python -m PyInstaller --noconsole --onefile --collect-data tkinterdnd2 RPYtoEXCEL.py
+
 import glob
 import os
 import sys
@@ -8,7 +10,6 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.worksheet.table import Table, TableStyleInfo
 import pandas as pd
 
-# Thử import thư viện Kéo - Thả
 try:
   from tkinterdnd2 import DND_FILES, TkinterDnD
 
@@ -17,7 +18,7 @@ except ImportError:
   HAS_DND = False
 
 
-# Từ điển đa ngôn ngữ đầy đủ (16 Ngôn ngữ)
+# Multilanguage
 TRANSLATIONS = {
     "English": {
         "title": "RPYtoEXCEL",
@@ -1937,32 +1938,42 @@ class RPYtoEXCELApp:
         if file_name in addition_trans:
           adds = addition_trans[file_name]
           if adds:
-            detected_lang = ""
-            for line in lines:
-              line_s = line.strip()
-              if line_s.startswith("translate ") and ":" in line_s:
-                parts = line_s.split()
-                if len(parts) >= 3 and parts[1] != "strings":
-                  detected_lang = parts[1]
-                  break
-                elif len(parts) >= 2 and parts[1] == "strings":
-                  break
+            existing_content = "".join(new_lines)
 
-            while len(new_lines) > 0 and new_lines[-1].strip() == "":
-              new_lines.pop()
-
-            new_lines.append("\n\n")
-
-            if detected_lang:
-              new_lines.append(f"translate {detected_lang} strings:\n")
-            else:
-              new_lines.append("translate strings:\n")
-
+            unique_adds = []
             for orig_text, trans_text in adds:
-              new_lines.append(f'    old "{orig_text}"\n')
-              new_lines.append(f'    new "{trans_text}"\n')
+              if f'old "{orig_text}"' not in existing_content:
+                unique_adds.append((orig_text, trans_text))
 
-            is_file_modified = True
+            if unique_adds:
+              detected_lang = ""
+              for line in lines:
+                line_s = line.strip()
+                if line_s.startswith("translate ") and ":" in line_s:
+                  parts = line_s.split()
+                  if len(parts) >= 3 and parts[1] != "strings":
+                    detected_lang = parts[1]
+                    break
+                  elif len(parts) >= 2 and parts[1] == "strings":
+                    break
+
+              while len(new_lines) > 0 and new_lines[-1].strip() == "":
+                new_lines.pop()
+
+              new_lines.append("\n\n")
+
+              if detected_lang:
+                new_lines.append(f"translate {detected_lang} strings:\n")
+              else:
+                new_lines.append("translate strings:\n")
+
+              for idx_add, (orig_text, trans_text) in enumerate(unique_adds):
+                if idx_add > 0:
+                  new_lines.append("\n")
+                new_lines.append(f'    old "{orig_text}"\n')
+                new_lines.append(f'    new "{trans_text}"\n')
+
+              is_file_modified = True
 
         if is_file_modified:
           with open(file_path, "w", encoding="utf-8") as f:
