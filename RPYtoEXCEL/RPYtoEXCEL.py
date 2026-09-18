@@ -1938,12 +1938,42 @@ class RPYtoEXCELApp:
         if file_name in addition_trans:
           adds = addition_trans[file_name]
           if adds:
-            existing_content = "".join(new_lines)
+            # Tạo dictionary lưu trữ bản dịch mới nhất từ sheet Addition
+            adds_dict = {orig: trans for orig, trans in adds}
+            added_keys = set()  # Đánh dấu các câu đã được cập nhật thành công
 
-            unique_adds = []
-            for orig_text, trans_text in adds:
-              if f'old "{orig_text}"' not in existing_content:
-                unique_adds.append((orig_text, trans_text))
+            # 1. Cập nhật bản dịch mới cho các câu old "..." đã có sẵn trong file RPY
+            j = 0
+            while j < len(new_lines):
+              line_strip = new_lines[j].strip()
+              if line_strip.startswith("old") and '"' in line_strip:
+                first_q = line_strip.find('"')
+                last_q = line_strip.rfind('"')
+                if first_q != last_q:
+                  orig_text = line_strip[first_q + 1 : last_q]
+                  if orig_text in adds_dict:
+                    new_trans = adds_dict[orig_text]
+                    added_keys.add(orig_text)
+
+                    # Kiểm tra xem dòng tiếp theo có phải 'new' hay không
+                    if j + 1 < len(new_lines) and new_lines[j + 1].strip().startswith("new"):
+                      next_line = new_lines[j + 1]
+                      t_start = next_line.find('"')
+                      t_end = next_line.rfind('"')
+                      if t_start != t_end:
+                        prefix = next_line[: t_start + 1]
+                        suffix = next_line[t_end:]
+                        if next_line[t_start + 1 : t_end] != new_trans:
+                          new_lines[j + 1] = f"{prefix}{new_trans}{suffix}"
+                          is_file_modified = True
+                    else:
+                      indent = new_lines[j][: new_lines[j].find("old")]
+                      new_lines.insert(j + 1, f'{indent}new "{new_trans}"\n')
+                      is_file_modified = True
+              j += 1
+
+            # 2. Lọc ra những câu hoàn toàn chưa có trong file RPY để thêm mới
+            unique_adds = [item for item in adds if item[0] not in added_keys]
 
             if unique_adds:
               detected_lang = ""
@@ -1969,7 +1999,7 @@ class RPYtoEXCELApp:
 
               for idx_add, (orig_text, trans_text) in enumerate(unique_adds):
                 if idx_add > 0:
-                  new_lines.append("\n")
+                  new_lines.append("\n")  # Cách 1 dòng trống giữa các câu cùng file
                 new_lines.append(f'    old "{orig_text}"\n')
                 new_lines.append(f'    new "{trans_text}"\n')
 
