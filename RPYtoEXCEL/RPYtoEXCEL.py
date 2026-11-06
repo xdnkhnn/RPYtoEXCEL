@@ -2,6 +2,7 @@
 
 import glob
 import os
+import re
 import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
@@ -26,6 +27,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Export RPY -> Excel ",
         "tab_merge": " 2. Merge Excel -> RPY ",
         "tab_sync": " 3. Sync Old RPY -> New RPY ",
+        "tab_combine": " 4. Combine RPY Files ",
         "export_frame": " Extract Translation Files ",
         "export_desc": "Select or DROP .rpy files / folders into the list below:",
         "btn_add_files": "Add RPY Files...",
@@ -45,6 +47,9 @@ TRANSLATIONS = {
             "2. Select or DROP NEW untranslated .rpy file(s) / folder:"
         ),
         "btn_start_sync": " START SYNCING TRANSLATIONS ",
+        "combine_frame": " Combine Same-named RPY Files ",
+        "lbl_combine_step": "Select or DROP all .rpy files to combine:",
+        "btn_start_combine": " START COMBINING RPY FILES ",
         "excel_notes_sheet": (
             "Please provide translations in the 'Translated' column. Once"
             " finished, save the file and use the 'Merge Excel -> RPY' tab to"
@@ -72,10 +77,14 @@ TRANSLATIONS = {
             " matched: {}"
         ),
         "msg_err_sync": "An error occurred while syncing:\n{}",
+        "msg_warn_combine_files": "Please select at least two .rpy files to combine!",
+        "msg_success_combine": "Successfully combined files!\n- Groups processed: {}\n- Saved to directory:\n{}",
+        "msg_err_combine": "An error occurred while combining:\n{}",
         "dlg_select_rpy": "Select .rpy Files",
         "dlg_save_excel": "Save Output Excel File",
         "dlg_select_excel": "Select Translated Excel File",
         "dlg_select_folder": "Select Folder Containing .rpy Files",
+        "dlg_select_out_dir": "Select Directory to Save Combined RPY Files",
         "warning": "Warning",
         "success": "Success",
         "error": "Error",
@@ -98,6 +107,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Trích Xuất RPY -> Excel ",
         "tab_merge": " 2. Ghép Excel -> RPY ",
         "tab_sync": " 3. Đồng bộ RPY Cũ -> RPY Mới ",
+        "tab_combine": " 4. Hợp Nhất Các File RPY ",
         "export_frame": " Trích xuất file dịch ",
         "export_desc": "Chọn hoặc KÉO THẢ các file/thư mục .rpy vào danh sách:",
         "btn_add_files": "Thêm File RPY...",
@@ -119,6 +129,9 @@ TRANSLATIONS = {
             "2. Chọn/KÉO THẢ các file/thư mục .rpy MỚI (Chưa dịch):"
         ),
         "btn_start_sync": " BẮT ĐẦU ĐỒNG BỘ BẢN DỊCH ",
+        "combine_frame": " Hợp nhất các file RPY trùng tên ",
+        "lbl_combine_step": "Chọn hoặc KÉO THẢ tất cả file .rpy cần hợp nhất vào danh sách:",
+        "btn_start_combine": " BẮT ĐẦU HỢP NHẤT FILE RPY ",
         "excel_notes_sheet": (
             "Vui lòng dịch ở cột 'Bản dịch'. Sau khi hoàn tất, lưu file và sử"
             " dụng tab 'Ghép Excel -> RPY' để hợp nhất bản dịch vào game."
@@ -143,10 +156,14 @@ TRANSLATIONS = {
             " câu thoại khớp: {}"
         ),
         "msg_err_sync": "Có lỗi xảy ra khi đồng bộ:\n{}",
+        "msg_warn_combine_files": "Vui lòng chọn ít nhất 2 file .rpy để thực hiện hợp nhất!",
+        "msg_success_combine": "Đã hợp nhất thành công các file RPY!\n- Số nhóm file đã xử lý: {}\n- Lưu tại thư mục:\n{}",
+        "msg_err_combine": "Có lỗi xảy ra khi hợp nhất các file RPY:\n{}",
         "dlg_select_rpy": "Chọn các file .rpy",
         "dlg_save_excel": "Lưu file Excel kết quả",
         "dlg_select_excel": "Chọn file Excel bản dịch",
         "dlg_select_folder": "Chọn thư mục chứa các file .rpy cần cập nhật",
+        "dlg_select_out_dir": "Chọn thư mục lưu file RPY sau khi hợp nhất",
         "warning": "Cảnh báo",
         "success": "Thành công",
         "error": "Lỗi",
@@ -169,6 +186,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Exportar RPY -> Excel ",
         "tab_merge": " 2. Combinar Excel -> RPY ",
         "tab_sync": " 3. Sincronizar RPY ",
+        "tab_combine": " 4. Combinar archivos RPY ",
         "export_frame": " Extraer archivos de traducción ",
         "export_desc": "Seleccione o ARRASTRE archivos/carpetas .rpy aquí:",
         "btn_add_files": "Añadir archivos RPY...",
@@ -184,6 +202,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. Seleccione archivos .rpy ANTIGUOS traducidos:",
         "lbl_new_rpy_step": "2. Seleccione archivos .rpy NUEVOS no traducidos:",
         "btn_start_sync": " INICIAR SINCRONIZACIÓN ",
+        "combine_frame": " Combinar archivos RPY con el mismo nombre ",
+        "lbl_combine_step": "Seleccione o ARRASTRE los archivos .rpy a combinar:",
+        "btn_start_combine": " INICIAR COMBINACIÓN DE RPY ",
         "excel_notes_sheet": (
             "Traduzca en la columna 'Traducción'. Guarde el archivo y use la"
             " pestaña 'Combinar Excel -> RPY'."
@@ -206,10 +227,14 @@ TRANSLATIONS = {
             " coincidentes: {}"
         ),
         "msg_err_sync": "Error al sincronizar:\n{}",
+        "msg_warn_combine_files": "¡Seleccione al menos dos archivos .rpy!",
+        "msg_success_combine": "¡Archivos RPY combinados con éxito!\n- Grupos procesados: {}\n- Guardado en:\n{}",
+        "msg_err_combine": "Error al combinar archivos RPY:\n{}",
         "dlg_select_rpy": "Seleccionar archivos .rpy",
         "dlg_save_excel": "Guardar archivo Excel",
         "dlg_select_excel": "Seleccionar archivo Excel",
         "dlg_select_folder": "Seleccionar carpeta .rpy",
+        "dlg_select_out_dir": "Seleccionar carpeta de salida",
         "warning": "Advertencia",
         "success": "Éxito",
         "error": "Error",
@@ -232,6 +257,7 @@ TRANSLATIONS = {
         "tab_export": " 1. 导出 RPY -> Excel ",
         "tab_merge": " 2. 合并 Excel -> RPY ",
         "tab_sync": " 3. 同步新旧 RPY ",
+        "tab_combine": " 4. 合并 RPY 文件 ",
         "export_frame": " 提取翻译文件 ",
         "export_desc": "选择或拖放 .rpy 文件/文件夹到下方列表：",
         "btn_add_files": "添加 RPY 文件...",
@@ -244,9 +270,12 @@ TRANSLATIONS = {
         "lbl_rpy_step": "2. 选择或拖放目标 .rpy 文件或文件夹：",
         "btn_start_merge": " 开始合并翻译 ",
         "sync_frame": " 同步旧版 RPY 翻译至新版 RPY ",
-        "lbl_old_rpy_step": "1. 选择或拖放已翻译的【旧版 .rpy】文件/文件夹：",
-        "lbl_new_rpy_step": "2. 选择或拖放未翻译的【新版 .rpy】文件/文件夹：",
+        "lbl_old_rpy_step": "1. 选择หรือ拖放已翻译的【旧版 .rpy】文件/文件夹：",
+        "lbl_new_rpy_step": "2. 选择หรือ拖放未翻译的【新版 .rpy】文件/文件夹：",
         "btn_start_sync": " 开始同步翻译 ",
+        "combine_frame": " 合并同名 RPY 文件 ",
+        "lbl_combine_step": "选择或拖放需要合并的所有 .rpy 文件：",
+        "btn_start_combine": " 开始合并 RPY 文件 ",
         "excel_notes_sheet": (
             "请在 '译文' 列中提供翻译。完成后保存并使用 '合并 Excel -> RPY'"
             " 选项卡。"
@@ -264,10 +293,14 @@ TRANSLATIONS = {
             "成功同步翻译！\n- 已更新文件数：{}\n- 成功匹配对话数：{}"
         ),
         "msg_err_sync": "同步时出错：\n{}",
+        "msg_warn_combine_files": "请至少选择两个 .rpy 文件进行合并！",
+        "msg_success_combine": "成功合并 RPY 文件！\n- 已处理组数：{}\n- 保存至目录：\n{}",
+        "msg_err_combine": "合并 RPY 文件时出错：\n{}",
         "dlg_select_rpy": "选择 .rpy 文件",
         "dlg_save_excel": "保存输出 Excel 文件",
         "dlg_select_excel": "选择翻译好的 Excel 文件",
         "dlg_select_folder": "选择包含 .rpy 文件的文件夹",
+        "dlg_select_out_dir": "选择保存合并 RPY 的目录",
         "warning": "警告",
         "success": "成功",
         "error": "错误",
@@ -290,6 +323,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Exportieren RPY -> Excel ",
         "tab_merge": " 2. Zusammenführen Excel -> RPY ",
         "tab_sync": " 3. RPY Synchronisieren ",
+        "tab_combine": " 4. RPY Zusammenfügen ",
         "export_frame": " Übersetzungsdateien extrahieren ",
         "export_desc": (
             "Wählen Sie .rpy-Dateien/Ordner aus oder ziehen Sie sie hierher:"
@@ -309,6 +343,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. Alte übersetzte .rpy-Dateien auswählen:",
         "lbl_new_rpy_step": "2. Neue unübersetzte .rpy-Dateien auswählen:",
         "btn_start_sync": " SYNCHRONISATION STARTEN ",
+        "combine_frame": " Gleichnamige RPY-Dateien zusammenfügen ",
+        "lbl_combine_step": "Alle zu zusammenfügenden .rpy-Dateien auswählen:",
+        "btn_start_combine": " RPY-DATEIEN ZUSAMMENFÜGEN ",
         "excel_notes_sheet": (
             "Tragen Sie Übersetzungen in die Spalte 'Übersetzung' ein."
         ),
@@ -330,10 +367,14 @@ TRANSLATIONS = {
             " Übereinstimmende Zeilen: {}"
         ),
         "msg_err_sync": "Fehler beim Synchronisieren:\n{}",
+        "msg_warn_combine_files": "Bitte wählen Sie mindestens zwei .rpy-Dateien aus!",
+        "msg_success_combine": "Erfolgreich zusammengefügt!\n- Gruppen verarbeitet: {}\n- Gespeichert in:\n{}",
+        "msg_err_combine": "Fehler beim Zusammenfügen:\n{}",
         "dlg_select_rpy": ".rpy-Dateien auswählen",
         "dlg_save_excel": "Excel-Datei speichern",
         "dlg_select_excel": "Excel-Datei auswählen",
         "dlg_select_folder": "Ordner auswählen",
+        "dlg_select_out_dir": "Zielordner auswählen",
         "warning": "Warnung",
         "success": "Erfolg",
         "error": "Fehler",
@@ -356,6 +397,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Exporter RPY -> Excel ",
         "tab_merge": " 2. Fusionner Excel -> RPY ",
         "tab_sync": " 3. Synchroniser RPY ",
+        "tab_combine": " 4. Combiner fichiers RPY ",
         "export_frame": " Extraire les fichiers de traduction ",
         "export_desc": (
             "Sélectionnez ou glissez-déposez les fichiers/dossiers .rpy :"
@@ -379,6 +421,9 @@ TRANSLATIONS = {
             "2. Sélectionner les NOUVEAUX fichiers .rpy non traduits :"
         ),
         "btn_start_sync": " LANCER LA SYNCHRONISATION ",
+        "combine_frame": " Combiner fichiers RPY du même nom ",
+        "lbl_combine_step": "Sélectionner ou glisser les fichiers .rpy à combiner :",
+        "btn_start_combine": " LANCER LA COMBINAISON DE RPY ",
         "excel_notes_sheet": "Traduisez dans la colonne 'Traduction'.",
         "msg_warn_select_rpy": (
             "Veuillez sélectionner au moins un fichier .rpy !"
@@ -398,10 +443,14 @@ TRANSLATIONS = {
             " correspondantes : {}"
         ),
         "msg_err_sync": "Erreur lors de la synchronisation :\n{}",
+        "msg_warn_combine_files": "Veuillez sélectionner au moins deux fichiers .rpy !",
+        "msg_success_combine": "Fichiers RPY combinés avec succès !\n- Groupes traités : {}\n- Enregistré dans :\n{}",
+        "msg_err_combine": "Erreur lors de la combinaison :\n{}",
         "dlg_select_rpy": "Sélectionner fichiers .rpy",
         "dlg_save_excel": "Enregistrer le fichier Excel",
         "dlg_select_excel": "Sélectionner le fichier Excel",
         "dlg_select_folder": "Sélectionner le dossier",
+        "dlg_select_out_dir": "Sélectionner dossier de sortie",
         "warning": "Avertissement",
         "success": "Succès",
         "error": "Erreur",
@@ -424,6 +473,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Ekspor RPY -> Excel ",
         "tab_merge": " 2. Gabung Excel -> RPY ",
         "tab_sync": " 3. Sinkronkan RPY ",
+        "tab_combine": " 4. Gabungkan Berkas RPY ",
         "export_frame": " Ekstrak Berkas Terjemahan ",
         "export_desc": (
             "Pilih atau TARIK berkas/folder .rpy ke daftar di bawah:"
@@ -441,6 +491,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. Pilih berkas .rpy LAMA yang sudah diterjemahkan:",
         "lbl_new_rpy_step": "2. Pilih berkas .rpy BARU yang belum diterjemahkan:",
         "btn_start_sync": " MULAI SINKRONISASI ",
+        "combine_frame": " Gabungkan Berkas RPY Bernama Sama ",
+        "lbl_combine_step": "Pilih atau TARIK semua berkas .rpy untuk digabungkan:",
+        "btn_start_combine": " MULAI PENGGABUNGAN RPY ",
         "excel_notes_sheet": "Isi terjemahan di kolom 'Terjemahan'.",
         "msg_warn_select_rpy": "Pilih setidaknya satu berkas .rpy!",
         "msg_success_export": "Berhasil diekspor ke:\n{}",
@@ -456,10 +509,14 @@ TRANSLATIONS = {
             " {}"
         ),
         "msg_err_sync": "Galat saat menyinkronkan:\n{}",
+        "msg_warn_combine_files": "Pilih setidaknya dua berkas .rpy!",
+        "msg_success_combine": "Berhasil menggabungkan berkas RPY!\n- Kelompok diproses: {}\n- Disimpan di:\n{}",
+        "msg_err_combine": "Galat saat menggabungkan berkas RPY:\n{}",
         "dlg_select_rpy": "Pilih Berkas .rpy",
         "dlg_save_excel": "Simpan Berkas Excel",
         "dlg_select_excel": "Pilih Berkas Excel",
         "dlg_select_folder": "Pilih Folder",
+        "dlg_select_out_dir": "Pilih Folder Hasil",
         "warning": "Peringatan",
         "success": "Berhasil",
         "error": "Galat",
@@ -482,6 +539,7 @@ TRANSLATIONS = {
         "tab_export": " 1. تصدير RPY -> Excel ",
         "tab_merge": " 2. دمج Excel -> RPY ",
         "tab_sync": " 3. مزامنة RPY ",
+        "tab_combine": " 4. دمج ملفات RPY ",
         "export_frame": " استخراج ملفات الترجمة ",
         "export_desc": "حدد أو اسحب ملفات/مجلدات .rpy أدناه:",
         "btn_add_files": "إضافة ملفات RPY...",
@@ -497,6 +555,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. حدد ملفات RPY القديمة المترجمة:",
         "lbl_new_rpy_step": "2. حدد ملفات RPY الجديدة غير المترجمة:",
         "btn_start_sync": " بدء المزامنة ",
+        "combine_frame": " دمج ملفات RPY المتطابقة في الاسم ",
+        "lbl_combine_step": "حدد أو اسحب جميع ملفات .rpy للدمج:",
+        "btn_start_combine": " بدء دمج ملفات RPY ",
         "excel_notes_sheet": "يرجى توفير الترجمات في عمود الترجمة.",
         "msg_warn_select_rpy": "يرجى تحديد ملف .rpy واحد على الأقل!",
         "msg_success_export": "تم التصدير بنجاح إلى:\n{}",
@@ -511,10 +572,14 @@ TRANSLATIONS = {
             "تمت المزامنة بنجاح!\n- الملفات المحدثة: {}\n- الجمل المتطابقة: {}"
         ),
         "msg_err_sync": "حدث خطأ أثناء المزامنة:\n{}",
+        "msg_warn_combine_files": "يرجى تحديد ملفين .rpy على الأقل!",
+        "msg_success_combine": "تم دمج ملفات RPY بنجاح!\n- المجموعات المعالجة: {}\n- حفظ في:\n{}",
+        "msg_err_combine": "حدث خطأ أثناء دمج ملفات RPY:\n{}",
         "dlg_select_rpy": "حدد ملفات .rpy",
         "dlg_save_excel": "حفظ ملف Excel",
         "dlg_select_excel": "حدد ملف Excel",
         "dlg_select_folder": "حدد المجلد",
+        "dlg_select_out_dir": "حدد مجلد الحفظ",
         "warning": "تحذير",
         "success": "نجاح",
         "error": "خطأ",
@@ -537,6 +602,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Dışa Aktar RPY -> Excel ",
         "tab_merge": " 2. Birleştir Excel -> RPY ",
         "tab_sync": " 3. RPY Senkronize Et ",
+        "tab_combine": " 4. RPY Dosyalarını Birleştir ",
         "export_frame": " Çeviri Dosyalarını Ayıkla ",
         "export_desc": (
             ".rpy dosyalarını/klasörlerini seçin veya buraya sürükleyin:"
@@ -554,6 +620,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. Çevrilmiş ESKİ .rpy dosyalarını seçin:",
         "lbl_new_rpy_step": "2. Çevrilmemiş YENİ .rpy dosyalarını seçin:",
         "btn_start_sync": " SENKRONİZASYONU BAŞLAT ",
+        "combine_frame": " Aynı İsimli RPY Dosyalarını Birleştir ",
+        "lbl_combine_step": "Birleştirilecek tüm .rpy dosyalarını seçin:",
+        "btn_start_combine": " RPY DOSYALARINI BİRLEŞTİR ",
         "excel_notes_sheet": "Lütfen çevirileri 'Çeviri' sütununa yazın.",
         "msg_warn_select_rpy": "Lütfen en az bir .rpy dosyası seçin!",
         "msg_success_export": "Başarıyla şuraya aktarıldı:\n{}",
@@ -573,10 +642,14 @@ TRANSLATIONS = {
             " Eşleşen satırlar: {}"
         ),
         "msg_err_sync": "Senkronize edilirken hata oluştu:\n{}",
+        "msg_warn_combine_files": "Lütfen en az iki .rpy dosyası seçin!",
+        "msg_success_combine": "RPY dosyaları başarıyla birleştirildi!\n- İşlenen grup: {}\n- Kaydedilen yer:\n{}",
+        "msg_err_combine": "Birleştirilirken hata oluştu:\n{}",
         "dlg_select_rpy": ".rpy Dosyalarını Seç",
         "dlg_save_excel": "Excel Dosyasını Kaydet",
         "dlg_select_excel": "Excel Dosyasını Seç",
         "dlg_select_folder": "Klasör Seç",
+        "dlg_select_out_dir": "Çıktı Klasörünü Seç",
         "warning": "Uyarı",
         "success": "Başarılı",
         "error": "Hata",
@@ -599,6 +672,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Exportar RPY -> Excel ",
         "tab_merge": " 2. Mesclar Excel -> RPY ",
         "tab_sync": " 3. Sincronizar RPY ",
+        "tab_combine": " 4. Combinar arquivos RPY ",
         "export_frame": " Extrair arquivos de tradução ",
         "export_desc": (
             "Selecione ou ARRASTE arquivos/pastas .rpy para a lista:"
@@ -616,6 +690,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. Selecione arquivos .rpy ANTIGOS traduzidos:",
         "lbl_new_rpy_step": "2. Selecione arquivos .rpy NOVOS não traduzidos:",
         "btn_start_sync": " INICIAR SINCRONIZAÇÃO ",
+        "combine_frame": " Combinar arquivos RPY com o mesmo nome ",
+        "lbl_combine_step": "Selecione ou ARRASTE todos os arquivos .rpy a combinar:",
+        "btn_start_combine": " INICIAR COMBINAÇÃO DE RPY ",
         "excel_notes_sheet": "Traduza na coluna 'Tradução'.",
         "msg_warn_select_rpy": "Selecione pelo menos um arquivo .rpy!",
         "msg_success_export": "Exportado com sucesso para:\n{}",
@@ -633,10 +710,14 @@ TRANSLATIONS = {
             " correspondentes: {}"
         ),
         "msg_err_sync": "Erro ao sincronizar:\n{}",
+        "msg_warn_combine_files": "Selecione pelo menos dois arquivos .rpy!",
+        "msg_success_combine": "Arquivos RPY combinados com sucesso!\n- Grupos processados: {}\n- Salvo em:\n{}",
+        "msg_err_combine": "Erro ao combinar arquivos RPY:\n{}",
         "dlg_select_rpy": "Selecionar arquivos .rpy",
         "dlg_save_excel": "Salvar arquivo Excel",
         "dlg_select_excel": "Selecionar arquivo Excel",
         "dlg_select_folder": "Selecionar pasta",
+        "dlg_select_out_dir": "Selecionar pasta de destino",
         "warning": "Aviso",
         "success": "Sucesso",
         "error": "Erro",
@@ -659,6 +740,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Eksportuj RPY -> Excel ",
         "tab_merge": " 2. Scal Excel -> RPY ",
         "tab_sync": " 3. Synchronizuj RPY ",
+        "tab_combine": " 4. Połącz pliki RPY ",
         "export_frame": " Wyodrębnij pliki tłumaczeń ",
         "export_desc": "Wybierz lub PRZECIĄGNIJ pliki/foldery .rpy do listy:",
         "btn_add_files": "Dodaj pliki RPY...",
@@ -678,6 +760,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. Wybierz STARE przetłumaczone pliki .rpy:",
         "lbl_new_rpy_step": "2. Wybierz NOWE nieprzetłumaczone pliki .rpy:",
         "btn_start_sync": " ROZPOCZNIJ SYNCHRONIZACJĘ ",
+        "combine_frame": " Połącz pliki RPY o tej samej nazwie ",
+        "lbl_combine_step": "Wybierz lub PRZECIĄGNIJ wszystkie pliki .rpy do połączenia:",
+        "btn_start_combine": " ROZPOCZNIJ ĄCZENIE RPY ",
         "excel_notes_sheet": "Wpisz tłumaczenia w kolumnie 'Tłumaczenie'.",
         "msg_warn_select_rpy": "Wybierz co najmniej jeden plik .rpy!",
         "msg_success_export": "Pomyślnie wyeksportowano do:\n{}",
@@ -695,10 +780,14 @@ TRANSLATIONS = {
             " zdania: {}"
         ),
         "msg_err_sync": "Błąd podczas synchronizacji:\n{}",
+        "msg_warn_combine_files": "Wybierz co najmniej dwa pliki .rpy!",
+        "msg_success_combine": "Pomyślnie połączono pliki RPY!\n- Przetworzone grupy: {}\n- Zapisano w:\n{}",
+        "msg_err_combine": "Błąd podczas łączenia plików RPY:\n{}",
         "dlg_select_rpy": "Wybierz pliki .rpy",
         "dlg_save_excel": "Zapisz plik Excel",
         "dlg_select_excel": "Wybierz plik Excel",
         "dlg_select_folder": "Wybierz folder",
+        "dlg_select_out_dir": "Wybierz folder docelowy",
         "warning": "Ostrzeżenie",
         "success": "Sukces",
         "error": "Błąd",
@@ -721,6 +810,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Экспорт RPY -> Excel ",
         "tab_merge": " 2. Слияние Excel -> RPY ",
         "tab_sync": " 3. Синхронизация RPY ",
+        "tab_combine": " 4. Объединение RPY ",
         "export_frame": " Извлечь файлы перевода ",
         "export_desc": "Выберите или ПЕРЕТАЩИТЕ файлы/папки .rpy:",
         "btn_add_files": "Добавить файлы RPY...",
@@ -740,6 +830,9 @@ TRANSLATIONS = {
             "2. Выберите непереведенные НОВЫЕ файлы/папки .rpy:"
         ),
         "btn_start_sync": " НАЧАТЬ СИНХРОНИЗАЦИЮ ",
+        "combine_frame": " Объединение одноименных файлов RPY ",
+        "lbl_combine_step": "Выберите или ПЕРЕТАЩИТЕ файлы .rpy для объединения:",
+        "btn_start_combine": " НАЧАТЬ ОБЪЕДИНЕНИЕ RPY ",
         "excel_notes_sheet": "Укажите перевод в столбце 'Перевод'.",
         "msg_warn_select_rpy": "Выберите хотя бы один файл .rpy!",
         "msg_success_export": "Успешно экспортировано в:\n{}",
@@ -757,10 +850,14 @@ TRANSLATIONS = {
             " строк: {}"
         ),
         "msg_err_sync": "Ошибка при синхронизации:\n{}",
+        "msg_warn_combine_files": "Выберите как минимум 2 файла .rpy!",
+        "msg_success_combine": "Успешно объединены файлы RPY!\n- Обработано групп: {}\n- Сохранено в:\n{}",
+        "msg_err_combine": "Ошибка при объединении RPY:\n{}",
         "dlg_select_rpy": "Выберите файлы .rpy",
         "dlg_save_excel": "Сохранить файл Excel",
         "dlg_select_excel": "Выберите файл Excel",
         "dlg_select_folder": "Выберите папку с файлами .rpy",
+        "dlg_select_out_dir": "Выберите папку сохранения",
         "warning": "Предупреждение",
         "success": "Успех",
         "error": "Ошибка",
@@ -783,6 +880,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Експорт RPY -> Excel ",
         "tab_merge": " 2. Злиття Excel -> RPY ",
         "tab_sync": " 3. Синхронізація RPY ",
+        "tab_combine": " 4. Об'єднання RPY ",
         "export_frame": " Витягти файли перекладу ",
         "export_desc": "Виберіть або ПЕРЕТЯГНІТЬ файли/папки .rpy нижче:",
         "btn_add_files": "Додати файли RPY...",
@@ -798,6 +896,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. Виберіть СТАРІ перекладені файли .rpy:",
         "lbl_new_rpy_step": "2. Виберіть НОВІ неперекладені файли .rpy:",
         "btn_start_sync": " ПОЧАТИ СИНХРОНІЗАЦІЮ ",
+        "combine_frame": " Об'єднання однойменних файлів RPY ",
+        "lbl_combine_step": "Виберіть або ПЕРЕТЯГНІТЬ всі файли .rpy для об'єднання:",
+        "btn_start_combine": " ПОЧАТИ ОБ'ЄДНАННЯ RPY ",
         "excel_notes_sheet": "Вкажіть переклад у стовпчику 'Переклад'.",
         "msg_warn_select_rpy": "Виберіть принаймні один файл .rpy!",
         "msg_success_export": "Успішно експортовано в:\n{}",
@@ -815,10 +916,14 @@ TRANSLATIONS = {
             " {}"
         ),
         "msg_err_sync": "Помилка під час синхронізації:\n{}",
+        "msg_warn_combine_files": "Виберіть щонайменше 2 файли .rpy!",
+        "msg_success_combine": "Успішно об'єднано файли RPY!\n- Оброблено груп: {}\n- Збережено у:\n{}",
+        "msg_err_combine": "Помилка під час об'єднання RPY:\n{}",
         "dlg_select_rpy": "Виберіть файли .rpy",
         "dlg_save_excel": "Зберегти файл Excel",
         "dlg_select_excel": "Виберіть файл Excel",
         "dlg_select_folder": "Виберіть папку з файлами .rpy",
+        "dlg_select_out_dir": "Виберіть папку збереження",
         "warning": "Попередження",
         "success": "Успіх",
         "error": "Помилка",
@@ -841,6 +946,7 @@ TRANSLATIONS = {
         "tab_export": " 1. 抽出 RPY -> Excel ",
         "tab_merge": " 2. 統合 Excel -> RPY ",
         "tab_sync": " 3. RPY 同期 ",
+        "tab_combine": " 4. RPY ファイル結合 ",
         "export_frame": " 翻訳ファイルの抽出 ",
         "export_desc": (
             ".rpy ファイル/フォルダを選択またはドラッグ＆ドロップしてください:"
@@ -858,6 +964,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. 翻訳済みの【旧 .rpy】ファイルを選択:",
         "lbl_new_rpy_step": "2. 未翻訳の【新 .rpy】ファイルを選択:",
         "btn_start_sync": " 同期を開始 ",
+        "combine_frame": " 同名 RPY ファイルの結合 ",
+        "lbl_combine_step": "結合するすべての .rpy ファイルを選択またはドロップ:",
+        "btn_start_combine": " RPY ファイルの結合を開始 ",
         "excel_notes_sheet": "'翻訳' 列に翻訳を入力してください。",
         "msg_warn_select_rpy": (
             "少なくとも1つの .rpy ファイルを選択してください！"
@@ -879,10 +988,14 @@ TRANSLATIONS = {
             " {}"
         ),
         "msg_err_sync": "同期中にエラーが発生しました:\n{}",
+        "msg_warn_combine_files": "少なくとも2つの .rpy ファイルを選択してください！",
+        "msg_success_combine": "RPY ファイルの結合が完了しました！\n- 処理されたグループ数: {}\n- 保存先:\n{}",
+        "msg_err_combine": "RPY 結合中にエラーが発生しました:\n{}",
         "dlg_select_rpy": ".rpy ファイルを選択",
         "dlg_save_excel": "Excel ファイルを保存",
         "dlg_select_excel": "Excel ファイルを選択",
         "dlg_select_folder": "フォルダを選択",
+        "dlg_select_out_dir": "保存先フォルダを選択",
         "warning": "警告",
         "success": "成功",
         "error": "エラー",
@@ -905,6 +1018,7 @@ TRANSLATIONS = {
         "tab_export": " 1. 추출 RPY -> Excel ",
         "tab_merge": " 2. 병합 Excel -> RPY ",
         "tab_sync": " 3. RPY 동기화 ",
+        "tab_combine": " 4. RPY 파일 병합 ",
         "export_frame": " 번역 파일 추출 ",
         "export_desc": ".rpy 파일이나 폴더를 선택하거나 끌어다 놓으세요:",
         "btn_add_files": "RPY 파일 추가...",
@@ -922,6 +1036,9 @@ TRANSLATIONS = {
         "lbl_old_rpy_step": "1. 번역된 [구버전 .rpy] 파일 선택:",
         "lbl_new_rpy_step": "2. 미번역된 [신버전 .rpy] 파일 선택:",
         "btn_start_sync": " 동기화 시작 ",
+        "combine_frame": " 동일 이름 RPY 파일 병합 ",
+        "lbl_combine_step": "병합할 모든 .rpy 파일을 선택하거나 끌어다 놓으세요:",
+        "btn_start_combine": " RPY 파일 병합 시작 ",
         "excel_notes_sheet": "'번역' 열에 번역문을 입력하세요.",
         "msg_warn_select_rpy": "최소 하나의 .rpy 파일을 선택하세요!",
         "msg_success_export": "성공적으로 내보냈습니다:\n{}",
@@ -939,10 +1056,14 @@ TRANSLATIONS = {
             " 대사: {}"
         ),
         "msg_err_sync": "동기화 중 오류 발생:\n{}",
+        "msg_warn_combine_files": "최소 2개 이상의 .rpy 파일을 선택하세요!",
+        "msg_success_combine": "RPY 파일 병합 완료!\n- 처리된 그룹 수: {}\n- 저장 위치:\n{}",
+        "msg_err_combine": "RPY 병합 중 오류 발생:\n{}",
         "dlg_select_rpy": ".rpy 파일 선택",
         "dlg_save_excel": "Excel 파일 저장",
         "dlg_select_excel": "Excel 파일 선택",
         "dlg_select_folder": "폴더 선택",
+        "dlg_select_out_dir": "저장 폴더 선택",
         "warning": "경고",
         "success": "성공",
         "error": "오류",
@@ -965,6 +1086,7 @@ TRANSLATIONS = {
         "tab_export": " 1. Esporta RPY -> Excel ",
         "tab_merge": " 2. Unisci Excel -> RPY ",
         "tab_sync": " 3. Sincronizza RPY ",
+        "tab_combine": " 4. Unisci file RPY ",
         "export_frame": " Estrai file di traduzione ",
         "export_desc": "Seleziona o TRASCINA i file/cartelle .rpy qui:",
         "btn_add_files": "Aggiungi file RPY...",
@@ -975,11 +1097,14 @@ TRANSLATIONS = {
         "lbl_excel_step": "1. Seleziona o TRASCINA il file Excel tradotto:",
         "btn_browse_excel": "Sfoglia Excel...",
         "lbl_rpy_step": "2. Seleziona o TRASCINA file .rpy o cartella:",
-        "btn_start_merge": " AVVIA UNIONE TRADUZIONI ",
+        "btn_start_merge": " AVVIA UNIONE TRADUZIONS ",
         "sync_frame": " Sincronizza Vecchio RPY -> Nuovo RPY ",
         "lbl_old_rpy_step": "1. Seleziona i VECCHI file .rpy tradotti:",
         "lbl_new_rpy_step": "2. Seleziona i NUOVI file .rpy non tradotti:",
         "btn_start_sync": " AVVIA SINCRONIZZAZIONE ",
+        "combine_frame": " Unisci file RPY con lo stesso nome ",
+        "lbl_combine_step": "Seleziona o TRASCINA tutti i file .rpy da unire:",
+        "btn_start_combine": " AVVIA UNIONE RPY ",
         "excel_notes_sheet": "Inserisci le traduzioni nella colonna 'Traduzione'.",
         "msg_warn_select_rpy": "Seleziona almeno un file .rpy!",
         "msg_success_export": "Esportato con successo in:\n{}",
@@ -997,10 +1122,14 @@ TRANSLATIONS = {
             " corrispondenti: {}"
         ),
         "msg_err_sync": "Errore durante la sincronizzazione:\n{}",
+        "msg_warn_combine_files": "Seleziona almeno due file .rpy!",
+        "msg_success_combine": "File RPY uniti con successo!\n- Gruppi elaborati: {}\n- Salvato in:\n{}",
+        "msg_err_combine": "Errore durante l'unione dei file RPY:\n{}",
         "dlg_select_rpy": "Seleziona file .rpy",
         "dlg_save_excel": "Salva file Excel",
         "dlg_select_excel": "Seleziona file Excel",
         "dlg_select_folder": "Seleziona cartella",
+        "dlg_select_out_dir": "Seleziona cartella di destinazione",
         "warning": "Avviso",
         "success": "Successo",
         "error": "Errore",
@@ -1027,7 +1156,7 @@ class RPYtoEXCELApp:
     self.current_lang = "English"
 
     self.root.title("RPYtoEXCEL")
-    self.root.geometry("720x650")
+    self.root.geometry("720x680")
     self.root.resizable(True, True)
 
     style = ttk.Style()
@@ -1066,6 +1195,10 @@ class RPYtoEXCELApp:
     self.notebook.add(self.tab_sync, text="")
     self.setup_sync_tab()
 
+    self.tab_combine = ttk.Frame(self.notebook)
+    self.notebook.add(self.tab_combine, text="")
+    self.setup_combine_tab()
+
     self.update_ui_text()
 
   def change_language(self, selected_lang):
@@ -1085,6 +1218,7 @@ class RPYtoEXCELApp:
     self.notebook.tab(self.tab_export, text=self.t("tab_export"))
     self.notebook.tab(self.tab_merge, text=self.t("tab_merge"))
     self.notebook.tab(self.tab_sync, text=self.t("tab_sync"))
+    self.notebook.tab(self.tab_combine, text=self.t("tab_combine"))
 
     self.export_lf.config(text=self.t("export_frame"))
     self.lbl_export_desc.config(text=self.t("export_desc"))
@@ -1113,6 +1247,13 @@ class RPYtoEXCELApp:
     self.btn_sync_new_folder.config(text=self.t("btn_add_folder"))
     self.btn_sync_new_clear.config(text=self.t("btn_clear_list"))
     self.btn_sync.config(text=self.t("btn_start_sync"))
+
+    self.combine_lf.config(text=self.t("combine_frame"))
+    self.lbl_combine_step.config(text=self.t("lbl_combine_step"))
+    self.btn_combine_add_files.config(text=self.t("btn_add_files"))
+    self.btn_combine_add_folder.config(text=self.t("btn_add_folder"))
+    self.btn_combine_clear.config(text=self.t("btn_clear_list"))
+    self.btn_combine.config(text=self.t("btn_start_combine"))
 
   def setup_export_tab(self):
     self.export_lf = ttk.LabelFrame(self.tab_export, text="")
@@ -1807,8 +1948,11 @@ class RPYtoEXCELApp:
           trans_val = row.get(trans_col, "") if trans_col else ""
           translated_text = "" if pd.isna(trans_val) else str(trans_val)
 
-          if not original_text.strip() or not translated_text.strip():
+          if not original_text.strip():
             continue
+
+          if not translated_text.strip():
+            translated_text = original_text
 
           if (
               original_text.startswith('"')
@@ -1938,11 +2082,11 @@ class RPYtoEXCELApp:
         if file_name in addition_trans:
           adds = addition_trans[file_name]
           if adds:
-            # Tạo dictionary lưu trữ bản dịch mới nhất từ sheet Addition
             adds_dict = {orig: trans for orig, trans in adds}
-            added_keys = set()  # Đánh dấu các câu đã được cập nhật thành công
+            added_keys = set()
 
-            # 1. Cập nhật bản dịch mới cho các câu old "..." đã có sẵn trong file RPY
+            has_strings_block = any("translate" in line and "strings" in line for line in new_lines)
+
             j = 0
             while j < len(new_lines):
               line_strip = new_lines[j].strip()
@@ -1955,7 +2099,6 @@ class RPYtoEXCELApp:
                     new_trans = adds_dict[orig_text]
                     added_keys.add(orig_text)
 
-                    # Kiểm tra xem dòng tiếp theo có phải 'new' hay không
                     if j + 1 < len(new_lines) and new_lines[j + 1].strip().startswith("new"):
                       next_line = new_lines[j + 1]
                       t_start = next_line.find('"')
@@ -1972,7 +2115,6 @@ class RPYtoEXCELApp:
                       is_file_modified = True
               j += 1
 
-            # 2. Lọc ra những câu hoàn toàn chưa có trong file RPY để thêm mới
             unique_adds = [item for item in adds if item[0] not in added_keys]
 
             if unique_adds:
@@ -1984,22 +2126,22 @@ class RPYtoEXCELApp:
                   if len(parts) >= 3 and parts[1] != "strings":
                     detected_lang = parts[1]
                     break
-                  elif len(parts) >= 2 and parts[1] == "strings":
-                    break
 
               while len(new_lines) > 0 and new_lines[-1].strip() == "":
                 new_lines.pop()
 
-              new_lines.append("\n\n")
-
-              if detected_lang:
-                new_lines.append(f"translate {detected_lang} strings:\n")
+              if not has_strings_block:
+                new_lines.append("\n\n")
+                if detected_lang:
+                  new_lines.append(f"translate {detected_lang} strings:\n")
+                else:
+                  new_lines.append("translate strings:\n")
               else:
-                new_lines.append("translate strings:\n")
+                new_lines.append("\n")
 
               for idx_add, (orig_text, trans_text) in enumerate(unique_adds):
-                if idx_add > 0:
-                  new_lines.append("\n")  # Cách 1 dòng trống giữa các câu cùng file
+                if idx_add > 0 or not has_strings_block:
+                  new_lines.append("\n")
                 new_lines.append(f'    old "{orig_text}"\n')
                 new_lines.append(f'    new "{trans_text}"\n')
 
@@ -2324,7 +2466,7 @@ class RPYtoEXCELApp:
           i += 1
 
         if is_file_modified:
-          with open(new_file, "w", encoding="utf-8") as f:
+          with open(file_path, "w", encoding="utf-8") as f:
             f.writelines(new_lines)
           updated_files_count += 1
 
@@ -2338,6 +2480,335 @@ class RPYtoEXCELApp:
     except Exception as e:
       messagebox.showerror(
           self.t("error"), self.t("msg_err_sync").format(str(e))
+      )
+
+  # ==========================================
+  # TAB 4: COMBINE RPY FILES IMPLEMENTATION
+  # ==========================================
+  def setup_combine_tab(self):
+    self.combine_lf = ttk.LabelFrame(self.tab_combine, text="")
+    self.combine_lf.pack(fill="both", expand=True, padx=15, pady=15)
+
+    self.lbl_combine_step = ttk.Label(
+        self.combine_lf, text="", font=("Segoe UI", 10, "bold")
+    )
+    self.lbl_combine_step.pack(anchor="w", padx=10, pady=(5, 2))
+
+    list_frame = ttk.Frame(self.combine_lf)
+    list_frame.pack(fill="both", expand=True, padx=10, pady=5)
+
+    self.combine_listbox = tk.Listbox(
+        list_frame, selectmode=tk.EXTENDED, height=10
+    )
+    self.combine_listbox.pack(side="left", fill="both", expand=True)
+
+    scrollbar = ttk.Scrollbar(
+        list_frame, orient="vertical", command=self.combine_listbox.yview
+    )
+    scrollbar.pack(side="right", fill="y")
+    self.combine_listbox.config(yscrollcommand=scrollbar.set)
+
+    if HAS_DND:
+      self.combine_listbox.drop_target_register(DND_FILES)
+      self.combine_listbox.dnd_bind("<<Drop>>", self.drop_combine_files)
+
+    btn_box = ttk.Frame(self.combine_lf)
+    btn_box.pack(fill="x", padx=10, pady=5)
+
+    self.btn_combine_add_files = ttk.Button(
+        btn_box, text="", command=self.add_combine_rpy_files
+    )
+    self.btn_combine_add_files.pack(side="left", padx=5)
+
+    self.btn_combine_add_folder = ttk.Button(
+        btn_box, text="", command=self.add_combine_rpy_folder
+    )
+    self.btn_combine_add_folder.pack(side="left", padx=5)
+
+    self.btn_combine_clear = ttk.Button(
+        btn_box, text="", command=lambda: self.combine_listbox.delete(0, tk.END)
+    )
+    self.btn_combine_clear.pack(side="left", padx=5)
+
+    self.btn_combine = ttk.Button(
+        self.combine_lf, text="", command=self.process_combine
+    )
+    self.btn_combine.pack(fill="x", padx=10, pady=10, ipady=5)
+
+  def drop_combine_files(self, event):
+    files = self.root.tk.splitlist(event.data)
+    for path in files:
+      path = path.strip("{}")
+      if os.path.isfile(path) and path.endswith(".rpy"):
+        if path not in self.combine_listbox.get(0, tk.END):
+          self.combine_listbox.insert(tk.END, path)
+      elif os.path.isdir(path):
+        rpy_files = glob.glob(os.path.join(path, "**", "*.rpy"), recursive=True)
+        for f in rpy_files:
+          if f not in self.combine_listbox.get(0, tk.END):
+            self.combine_listbox.insert(tk.END, f)
+
+  def add_combine_rpy_files(self):
+    files = filedialog.askopenfilenames(
+        title=self.t("dlg_select_rpy"),
+        filetypes=[("Ren'Py Script", "*.rpy"), ("All Files", "*.*")],
+    )
+    for f in files:
+      if f not in self.combine_listbox.get(0, tk.END):
+        self.combine_listbox.insert(tk.END, f)
+
+  def add_combine_rpy_folder(self):
+    d = filedialog.askdirectory(title=self.t("dlg_select_folder"))
+    if d:
+      rpy_files = glob.glob(os.path.join(d, "**", "*.rpy"), recursive=True)
+      for f in rpy_files:
+        if f not in self.combine_listbox.get(0, tk.END):
+          self.combine_listbox.insert(tk.END, f)
+
+  def _extract_line_number(self, location_line):
+    if not location_line:
+      return 99999999
+    match = re.search(r":(\d+)\s*$", location_line.strip())
+    if match:
+      return int(match.group(1))
+    return 99999999
+
+  def _is_dialogue_translated(self, block_lines):
+    orig_text = ""
+    trans_text = ""
+    for idx, line in enumerate(block_lines):
+      line_s = line.strip()
+      if line_s.startswith("#") and '"' in line_s and not line_s.startswith("# game/"):
+        q_start = line.find('"')
+        q_end = line.rfind('"')
+        if q_start != q_end:
+          orig_text = line[q_start + 1 : q_end]
+      elif '"' in line_s and not line_s.startswith("#") and not line_s.startswith("translate"):
+        q_start = line.find('"')
+        q_end = line.rfind('"')
+        if q_start != q_end:
+          trans_text = line[q_start + 1 : q_end]
+
+    if trans_text and trans_text.strip() and trans_text != orig_text:
+      return True
+    return False
+
+  def _is_string_translated(self, clean_block_lines):
+    old_text = ""
+    new_text = ""
+    for line in clean_block_lines:
+      line_s = line.strip()
+      if line_s.startswith("old") and '"' in line_s:
+        q_start = line.find('"')
+        q_end = line.rfind('"')
+        if q_start != q_end:
+          old_text = line[q_start + 1 : q_end]
+      elif line_s.startswith("new") and '"' in line_s:
+        q_start = line.find('"')
+        q_end = line.rfind('"')
+        if q_start != q_end:
+          new_text = line[q_start + 1 : q_end]
+
+    if new_text and new_text.strip() and new_text != old_text:
+      return True
+    return False
+
+  def _cleanup_duplicate_strings_header(self, lines_list):
+    cleaned = []
+    has_seen_strings_header = False
+
+    for line in lines_list:
+      line_strip = line.strip()
+      if line_strip.startswith("translate ") and "strings:" in line_strip:
+        if not has_seen_strings_header:
+          has_seen_strings_header = True
+          cleaned.append(line)
+        else:
+          continue
+      else:
+        cleaned.append(line)
+
+    return cleaned
+
+  def process_combine(self):
+    input_files = list(self.combine_listbox.get(0, tk.END))
+    if not input_files:
+      messagebox.showwarning(self.t("warning"), self.t("msg_warn_select_rpy"))
+      return
+
+    file_groups = {}
+    for fpath in input_files:
+      if os.path.isfile(fpath) and fpath.endswith(".rpy"):
+        fname = os.path.basename(fpath)
+        if fname not in file_groups:
+          file_groups[fname] = []
+        file_groups[fname].append(fpath)
+
+    out_dir = filedialog.askdirectory(title=self.t("dlg_select_out_dir"))
+    if not out_dir:
+      return
+
+    try:
+      processed_groups_count = 0
+
+      for fname, file_list in file_groups.items():
+        dialogue_blocks_by_label = {}
+        string_blocks_by_old = {}
+        detected_language = "vietnamese"
+
+        for file_idx, fpath in enumerate(file_list):
+          with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+            lines = f.readlines()
+
+          i = 0
+          while i < len(lines):
+            line_s = lines[i].strip()
+
+            if line_s.startswith("# TODO:") or (line_s.startswith("#") and not line_s.startswith("# game/")):
+              i += 1
+              continue
+
+            if line_s.startswith("translate ") and line_s.endswith(":"):
+              parts = line_s.split()
+              if len(parts) >= 3 and parts[1] != "strings":
+                detected_language = parts[1]
+                label_name = parts[2].replace(":", "").strip()
+
+                loc_line = ""
+                if i > 0 and lines[i - 1].strip().startswith("# game/"):
+                  loc_line = lines[i - 1]
+
+                block_lines = []
+                if loc_line:
+                  block_lines.append(loc_line)
+                block_lines.append(lines[i])
+
+                i += 1
+                while i < len(lines):
+                  sub_s = lines[i].strip()
+                  if (
+                      sub_s.startswith("translate ")
+                      or sub_s.startswith("# game/")
+                      or sub_s.startswith("old ")
+                  ):
+                    break
+                  block_lines.append(lines[i])
+                  i += 1
+
+                line_num = self._extract_line_number(loc_line)
+                is_trans = self._is_dialogue_translated(block_lines)
+
+                block_item = {
+                    "label": label_name,
+                    "location": loc_line,
+                    "line_num": line_num,
+                    "lines": block_lines,
+                    "is_translated": is_trans,
+                    "file_order": file_idx,
+                }
+
+                if label_name not in dialogue_blocks_by_label:
+                  dialogue_blocks_by_label[label_name] = block_item
+                else:
+                  existing = dialogue_blocks_by_label[label_name]
+                  if not existing["is_translated"] and is_trans:
+                    dialogue_blocks_by_label[label_name] = block_item
+                  elif existing["is_translated"] == is_trans:
+                    if file_idx >= existing["file_order"]:
+                      dialogue_blocks_by_label[label_name] = block_item
+                continue
+
+            elif line_s.startswith("old ") and '"' in line_s:
+              q_start = line_s.find('"')
+              q_end = line_s.rfind('"')
+              old_text = line_s[q_start + 1 : q_end] if q_start != q_end else ""
+
+              loc_line = ""
+              if i > 0 and lines[i - 1].strip().startswith("# game/"):
+                loc_line = lines[i - 1].strip()
+
+              new_line_str = f'new "{old_text}"'
+              i += 1
+              if i < len(lines) and lines[i].strip().startswith("new "):
+                new_line_str = lines[i].strip()
+                i += 1
+
+              line_num = self._extract_line_number(loc_line)
+
+              clean_block_lines = []
+              if loc_line:
+                clean_block_lines.append(f"{loc_line}\n" if loc_line.startswith("#") else f"# {loc_line}\n")
+              clean_block_lines.append(f'old "{old_text}"\n')
+              clean_block_lines.append(f'{new_line_str}\n')
+
+              block_item = {
+                  "old_text": old_text,
+                  "location": loc_line,
+                  "line_num": line_num,
+                  "lines": clean_block_lines,
+                  "is_translated": self._is_string_translated(clean_block_lines),
+                  "file_order": file_idx,
+              }
+
+              if old_text not in string_blocks_by_old:
+                string_blocks_by_old[old_text] = block_item
+              else:
+                existing = string_blocks_by_old[old_text]
+                if not existing["is_translated"] and block_item["is_translated"]:
+                  string_blocks_by_old[old_text] = block_item
+                elif existing["is_translated"] == block_item["is_translated"]:
+                  if file_idx >= existing["file_order"]:
+                    string_blocks_by_old[old_text] = block_item
+              continue
+
+            i += 1
+
+        sorted_dialogues = sorted(
+            dialogue_blocks_by_label.values(), key=lambda x: x["line_num"]
+        )
+        sorted_strings = sorted(
+            string_blocks_by_old.values(), key=lambda x: x["line_num"]
+        )
+
+        final_content = []
+        final_content.append(f"# TODO: Translation updated at combined\n\n")
+
+        for item in sorted_dialogues:
+          for b_line in item["lines"]:
+            final_content.append(b_line)
+          if not final_content[-1].endswith("\n"):
+            final_content.append("\n")
+          final_content.append("\n")
+
+        if sorted_strings:
+          final_content.append(f"translate {detected_language} strings:\n\n")
+          for idx, item in enumerate(sorted_strings):
+            for b_line in item["lines"]:
+              stripped_b = b_line.strip()
+              if stripped_b.startswith("# game/"):
+                final_content.append(f"    {stripped_b}\n")
+              elif stripped_b.startswith("old ") or stripped_b.startswith("new "):
+                final_content.append(f"    {stripped_b}\n")
+
+            if idx < len(sorted_strings) - 1:
+              final_content.append("\n")
+
+        final_content = self._cleanup_duplicate_strings_header(final_content)
+
+        out_path = os.path.join(out_dir, fname)
+        with open(out_path, "w", encoding="utf-8") as out_f:
+          out_f.writelines(final_content)
+
+        processed_groups_count += 1
+
+      messagebox.showinfo(
+          self.t("success"),
+          self.t("msg_success_combine").format(processed_groups_count, out_dir),
+      )
+
+    except Exception as e:
+      messagebox.showerror(
+          self.t("error"), self.t("msg_err_combine").format(str(e))
       )
 
 
