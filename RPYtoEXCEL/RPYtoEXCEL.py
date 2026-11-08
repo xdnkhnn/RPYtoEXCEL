@@ -2644,6 +2644,10 @@ class RPYtoEXCELApp:
           file_groups[fname] = []
         file_groups[fname].append(fpath)
 
+    if not file_groups:
+      messagebox.showwarning(self.t("warning"), self.t("msg_warn_select_rpy"))
+      return
+
     out_dir = filedialog.askdirectory(title=self.t("dlg_select_out_dir"))
     if not out_dir:
       return
@@ -2654,69 +2658,81 @@ class RPYtoEXCELApp:
       for fname, file_list in file_groups.items():
         dialogue_blocks_by_label = {}
         string_blocks_by_old = {}
-        detected_language = "vietnamese"
+        group_language = None
 
         for file_idx, fpath in enumerate(file_list):
           with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
             lines = f.readlines()
 
+          file_languages = set()
           i = 0
           while i < len(lines):
             line_s = lines[i].strip()
 
-            if line_s.startswith("# TODO:") or (line_s.startswith("#") and not line_s.startswith("# game/")):
+            if line_s.startswith("# TODO:") or (
+                line_s.startswith("#") and not line_s.startswith("# game/")
+            ):
               i += 1
               continue
 
             if line_s.startswith("translate ") and line_s.endswith(":"):
               parts = line_s.split()
-              if len(parts) >= 3 and parts[1] != "strings":
-                detected_language = parts[1]
-                label_name = parts[2].replace(":", "").strip()
-
-                loc_line = ""
-                if i > 0 and lines[i - 1].strip().startswith("# game/"):
-                  loc_line = lines[i - 1]
-
-                block_lines = []
-                if loc_line:
-                  block_lines.append(loc_line)
-                block_lines.append(lines[i])
-
+              if len(parts) < 3:
                 i += 1
-                while i < len(lines):
-                  sub_s = lines[i].strip()
-                  if (
-                      sub_s.startswith("translate ")
-                      or sub_s.startswith("# game/")
-                      or sub_s.startswith("old ")
-                  ):
-                    break
-                  block_lines.append(lines[i])
-                  i += 1
-
-                line_num = self._extract_line_number(loc_line)
-                is_trans = self._is_dialogue_translated(block_lines)
-
-                block_item = {
-                    "label": label_name,
-                    "location": loc_line,
-                    "line_num": line_num,
-                    "lines": block_lines,
-                    "is_translated": is_trans,
-                    "file_order": file_idx,
-                }
-
-                if label_name not in dialogue_blocks_by_label:
-                  dialogue_blocks_by_label[label_name] = block_item
-                else:
-                  existing = dialogue_blocks_by_label[label_name]
-                  if not existing["is_translated"] and is_trans:
-                    dialogue_blocks_by_label[label_name] = block_item
-                  elif existing["is_translated"] == is_trans:
-                    if file_idx >= existing["file_order"]:
-                      dialogue_blocks_by_label[label_name] = block_item
                 continue
+
+              language = parts[1]
+              file_languages.add(language)
+
+              # A strings header declares the language but is not a dialogue label.
+              if parts[2] == "strings:":
+                i += 1
+                continue
+
+              label_name = parts[2].replace(":", "").strip()
+              loc_line = ""
+              if i > 0 and lines[i - 1].strip().startswith("# game/"):
+                loc_line = lines[i - 1]
+
+              block_lines = []
+              if loc_line:
+                block_lines.append(loc_line)
+              block_lines.append(lines[i])
+
+              i += 1
+              while i < len(lines):
+                sub_s = lines[i].strip()
+                if (
+                    sub_s.startswith("translate ")
+                    or sub_s.startswith("# game/")
+                    or sub_s.startswith("old ")
+                ):
+                  break
+                block_lines.append(lines[i])
+                i += 1
+
+              line_num = self._extract_line_number(loc_line)
+              is_trans = self._is_dialogue_translated(block_lines)
+
+              block_item = {
+                  "label": label_name,
+                  "location": loc_line,
+                  "line_num": line_num,
+                  "lines": block_lines,
+                  "is_translated": is_trans,
+                  "file_order": file_idx,
+              }
+
+              if label_name not in dialogue_blocks_by_label:
+                dialogue_blocks_by_label[label_name] = block_item
+              else:
+                existing = dialogue_blocks_by_label[label_name]
+                if not existing["is_translated"] and is_trans:
+                  dialogue_blocks_by_label[label_name] = block_item
+                elif existing["is_translated"] == is_trans:
+                  if file_idx >= existing["file_order"]:
+                    dialogue_blocks_by_label[label_name] = block_item
+              continue
 
             elif line_s.startswith("old ") and '"' in line_s:
               q_start = line_s.find('"')
@@ -2737,9 +2753,12 @@ class RPYtoEXCELApp:
 
               clean_block_lines = []
               if loc_line:
-                clean_block_lines.append(f"{loc_line}\n" if loc_line.startswith("#") else f"# {loc_line}\n")
-              clean_block_lines.append(f'old "{old_text}"\n')
-              clean_block_lines.append(f'{new_line_str}\n')
+                clean_block_lines.append(
+                    f"{loc_line}\\n" if loc_line.startswith("#")
+                    else f"# {loc_line}\\n"
+                )
+              clean_block_lines.append(f'old "{old_text}"\\n')
+              clean_block_lines.append(f'{new_line_str}\\n')
 
               block_item = {
                   "old_text": old_text,
@@ -2763,6 +2782,26 @@ class RPYtoEXCELApp:
 
             i += 1
 
+          if len(file_languages) == 0:
+            raise ValueError(
+                f"Cannot detect the translation language in: {os.path.basename(fpath)}"
+            )
+          if len(file_languages) > 1:
+            languages = ", ".join(sorted(file_languages))
+            raise ValueError(
+                f"Multiple translation languages found in {os.path.basename(fpath)}: {languages}"
+            )
+
+          file_language = next(iter(file_languages))
+          if group_language is None:
+            group_language = file_language
+          elif file_language != group_language:
+            raise ValueError(
+                f"Language mismatch in the '{fname}' group: "
+                f"expected '{group_language}', found '{file_language}' "
+                f"in {os.path.basename(fpath)}"
+            )
+
         sorted_dialogues = sorted(
             dialogue_blocks_by_label.values(), key=lambda x: x["line_num"]
         )
@@ -2771,27 +2810,27 @@ class RPYtoEXCELApp:
         )
 
         final_content = []
-        final_content.append(f"# TODO: Translation updated at combined\n\n")
+        final_content.append("# TODO: Translation updated at combined\\n\\n")
 
         for item in sorted_dialogues:
           for b_line in item["lines"]:
             final_content.append(b_line)
-          if not final_content[-1].endswith("\n"):
-            final_content.append("\n")
-          final_content.append("\n")
+          if not final_content[-1].endswith("\\n"):
+            final_content.append("\\n")
+          final_content.append("\\n")
 
         if sorted_strings:
-          final_content.append(f"translate {detected_language} strings:\n\n")
+          final_content.append(f"translate {group_language} strings:\\n\\n")
           for idx, item in enumerate(sorted_strings):
             for b_line in item["lines"]:
               stripped_b = b_line.strip()
               if stripped_b.startswith("# game/"):
-                final_content.append(f"    {stripped_b}\n")
+                final_content.append(f"    {stripped_b}\\n")
               elif stripped_b.startswith("old ") or stripped_b.startswith("new "):
-                final_content.append(f"    {stripped_b}\n")
+                final_content.append(f"    {stripped_b}\\n")
 
             if idx < len(sorted_strings) - 1:
-              final_content.append("\n")
+              final_content.append("\\n")
 
         final_content = self._cleanup_duplicate_strings_header(final_content)
 
