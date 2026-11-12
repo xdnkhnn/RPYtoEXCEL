@@ -39,6 +39,7 @@ TRANSLATIONS = {
         "btn_browse_excel": "Browse Excel...",
         "lbl_rpy_step": "2. Select or DROP target .rpy file(s) / folder:",
         "btn_start_merge": " START MERGING TRANSLATIONS ",
+        "merge_fill_blank_original": "Fill empty translations with original text",
         "sync_frame": " Sync Translations (Old RPY -> New RPY) ",
         "lbl_old_rpy_step": (
             "1. Select or DROP OLD translated .rpy file(s) / folder:"
@@ -121,6 +122,7 @@ TRANSLATIONS = {
         "btn_browse_excel": "Chọn Excel...",
         "lbl_rpy_step": "2. Chọn hoặc KÉO THẢ các file/Thư mục .rpy cần gộp:",
         "btn_start_merge": " BẮT ĐẦU GỘP BẢN DỊCH ",
+        "merge_fill_blank_original": "Tự điền bản gốc vào ô bản dịch bị trống",
         "sync_frame": " Đồng bộ bản dịch từ RPY Cũ sang RPY Mới ",
         "lbl_old_rpy_step": (
             "1. Chọn/KÉO THẢ các file/thư mục .rpy CŨ (Đã dịch):"
@@ -1235,6 +1237,7 @@ class RPYtoEXCELApp:
     self.btn_merge_add_folder.config(text=self.t("btn_add_folder"))
     self.btn_merge_clear.config(text=self.t("btn_clear_list"))
     self.btn_merge.config(text=self.t("btn_start_merge"))
+    self.chk_merge_fill_blank.config(text=self.t("merge_fill_blank_original"))
 
     self.sync_lf.config(text=self.t("sync_frame"))
     self.lbl_old_rpy_step.config(text=self.t("lbl_old_rpy_step"))
@@ -1726,6 +1729,14 @@ class RPYtoEXCELApp:
     )
     self.btn_merge_clear.pack(side="left", padx=5)
 
+    self.merge_fill_blank_var = tk.BooleanVar(value=False)
+    self.chk_merge_fill_blank = ttk.Checkbutton(
+        self.merge_lf,
+        text="",
+        variable=self.merge_fill_blank_var,
+    )
+    self.chk_merge_fill_blank.pack(anchor="w", padx=15, pady=(2, 5))
+
     self.btn_merge = ttk.Button(
         self.merge_lf, text="", command=self.process_merge
     )
@@ -1952,7 +1963,10 @@ class RPYtoEXCELApp:
             continue
 
           if not translated_text.strip():
-            translated_text = original_text
+            if self.merge_fill_blank_var.get():
+              translated_text = original_text
+            else:
+              continue
 
           if (
               original_text.startswith('"')
